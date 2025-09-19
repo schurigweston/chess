@@ -1,1 +1,0 @@
-Are these synced? Git still works? push still works?
