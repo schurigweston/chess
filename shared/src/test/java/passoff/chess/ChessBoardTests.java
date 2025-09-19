@@ -30,6 +30,7 @@ public class ChessBoardTests extends EqualsTestingUtility<ChessBoard> {
                 );
             }
         }
+        //System.out.println(board.toStringBoard());
 
     }
 
@@ -49,14 +50,16 @@ public class ChessBoardTests extends EqualsTestingUtility<ChessBoard> {
                 "ChessPiece returned by getPiece had the wrong piece type");
         Assertions.assertEquals(piece.getTeamColor(), foundPiece.getTeamColor(),
                 "ChessPiece returned by getPiece had the wrong team color");
+        //System.out.println(board.toStringBoard());
     }
 
     @Test
     @DisplayName("Reset Board")
     public void defaultGameBoard() {
         var expectedBoard = TestUtilities.defaultBoard();
-
+        //System.out.println(expectedBoard.toStringBoard());
         var actualBoard = new ChessBoard();
+        //System.out.println(actualBoard.toStringBoard());
         actualBoard.resetBoard();
 
         Assertions.assertEquals(expectedBoard, actualBoard, "Reset board did not create the correct board");

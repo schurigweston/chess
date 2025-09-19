@@ -77,4 +77,45 @@ public class ChessPiece {
     public String toString() {
         return "Piece{" + pieceColor + " " + pieceType + '}';
     }
+    public String getCharacter(){//♙♘♗♖♕♔♚♛♜♝♞♟
+        if(this.pieceType==PieceType.PAWN){
+            if(this.pieceColor== ChessGame.TeamColor.WHITE){
+                return "♙";
+            }else{
+                return"♟";
+            }
+        }else if(this.pieceType==PieceType.KNIGHT){
+            if(this.pieceColor== ChessGame.TeamColor.WHITE){
+                return "♘";
+            }else{
+                return"♞";
+            }
+        }else if(this.pieceType==PieceType.BISHOP){
+            if(this.pieceColor== ChessGame.TeamColor.WHITE){
+                return "♗";
+            }else{
+                return"♝";
+            }
+        }else if(this.pieceType==PieceType.ROOK){
+            if(this.pieceColor== ChessGame.TeamColor.WHITE){
+                return "♖";
+            }else{
+                return"♜";
+            }
+        }else if(this.pieceType==PieceType.QUEEN){
+            if(this.pieceColor== ChessGame.TeamColor.WHITE){
+                return "♕";
+            }else{
+                return"♛";
+            }
+        }else if(this.pieceType==PieceType.KING){
+            if(this.pieceColor== ChessGame.TeamColor.WHITE){
+                return "♔";
+            }else{
+                return"♚";
+            }
+        }else{
+            return "❎";
+        }
+    }
 }
