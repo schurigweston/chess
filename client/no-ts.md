@@ -1,1 +1,1 @@
-Are these synced?
+Are these synced? Git still works?
