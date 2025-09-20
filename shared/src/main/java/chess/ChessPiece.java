@@ -140,18 +140,8 @@ public class ChessPiece {
         return getSlideMoves(board,myPosition, directions,true);
     }
     private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition){
-        List<ChessMove> moves = new ArrayList<>();
-        ChessPosition potentialPosition;
-
-        int[][] knightMoves = {{2,1},{2,-1},{-2,1},{-2,-1},{1,2},{1,-2},{-1,2},{-1,-2}};
-        for(int[] move : knightMoves){
-            potentialPosition = new ChessPosition(myPosition.getRow()+move[0],myPosition.getColumn()+move[1]);//Position to consider
-
-            if(isValidMovePosition(board, potentialPosition, board.getPiece(myPosition).getTeamColor())){
-                moves.add(new ChessMove(myPosition, potentialPosition, null));
-            }
-        }
-        return moves;
+        int[][] directions = {{2,1},{2,-1},{-2,1},{-2,-1},{1,2},{1,-2},{-1,2},{-1,-2}};
+        return getSlideMoves(board,myPosition, directions,false);
     }
     private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition){
         List<ChessMove> moves = new ArrayList<>();
