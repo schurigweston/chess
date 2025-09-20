@@ -132,57 +132,12 @@ public class ChessPiece {
         return getSlideMoves(board,myPosition, directions,true);
     }
     private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition){
-        List<ChessMove> moves = new ArrayList<>();
-        ChessPosition potentialPosition;
-        for (int i = -1; i <= 1; i+=2) {
-            for (int j = -1; j <= 1; j+=2) {
-                int distance = 1;
-                while(true) {
-                    potentialPosition = new ChessPosition(myPosition.getRow()+i*distance,myPosition.getColumn()+j*distance);//Position to consider
-
-                    if(isValidMovePosition(board, potentialPosition, board.getPiece(myPosition).getTeamColor())){
-                        moves.add(new ChessMove(myPosition, potentialPosition, null));
-                        if (board.getPiece(potentialPosition)!=null){
-                            break;
-                        }
-                    }else{
-                        break;
-                    }
-                    distance++;
-                }
-            }
-        }
-        return moves;
+        int[][] directions = {{-1,-1},{-1,1},{0,0},{1,-1},{1,1}};
+        return getSlideMoves(board,myPosition, directions,true);
     }
     private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition){
-        List<ChessMove> moves = new ArrayList<>();
-        ChessPosition potentialPosition;
-
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
-                if(!((i==0)==(j==0))){ //xor i and j. if
-                    int distance = 1;
-                    while(true) {
-                        potentialPosition = new ChessPosition(myPosition.getRow()+i*distance,myPosition.getColumn()+j*distance);//Position to consider
-
-                        if(isValidMovePosition(board, potentialPosition, board.getPiece(myPosition).getTeamColor())){
-                            moves.add(new ChessMove(myPosition, potentialPosition, null));
-                            if (board.getPiece(potentialPosition)!=null){
-                                break;
-                            }
-                        }else{
-                            break;
-                        }
-                        distance++;
-                    }
-                }
-
-            }
-        }
-        return moves;
-
-
-
+        int[][] directions = {{-1,0},{0,-1},{0,0},{0,1},{1,0}};
+        return getSlideMoves(board,myPosition, directions,true);
     }
     private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition){
         List<ChessMove> moves = new ArrayList<>();
