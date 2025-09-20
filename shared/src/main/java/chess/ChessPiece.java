@@ -84,11 +84,17 @@ public class ChessPiece {
     }
     private boolean isValidMovePosition(ChessBoard board, ChessPosition potentialPosition, ChessGame.TeamColor color){
 
-        if(potentialPosition.getRow()>=1&&potentialPosition.getRow()<=8&&potentialPosition.getColumn()>=1&&potentialPosition.getColumn()<=8){//Both row and column are between 1 and 8
+        if(isInBounds(potentialPosition)){//Both row and column are between 1 and 8
             ChessPiece potentialPositionPiece = board.getPiece(potentialPosition);
             if(potentialPositionPiece==null||!color.equals(potentialPositionPiece.getTeamColor())){//If the space is empty or occupied by a piece not of the same color.
                 return true;
             }
+        }
+        return false;
+    }
+    private boolean isInBounds(ChessPosition potentialPosition){
+        if(potentialPosition.getRow()>=1&&potentialPosition.getRow()<=8&&potentialPosition.getColumn()>=1&&potentialPosition.getColumn()<=8) {//Both row and column are between 1 and 8
+            return true;
         }
         return false;
     }
@@ -203,7 +209,43 @@ public class ChessPiece {
     private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition){
         List<ChessMove> moves = new ArrayList<>();
         ChessPosition potentialPosition;
-        if(board.getPiece(myPosition).getTeamColor()== ChessGame.TeamColor.WHITE){//man, pawns are weird
+
+        int direction = (board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.WHITE) ? 1 : -1;
+        int startingRow = (board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.WHITE) ? 2 : 7;
+        int promotableRow = (board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.WHITE) ? 7 : 2;
+
+
+
+
+        potentialPosition = new ChessPosition(myPosition.getRow()+direction,myPosition.getColumn());
+        if(board.getPiece(potentialPosition) == null){//the spot in front is empty
+            moves.add(new ChessMove(myPosition, potentialPosition, null));//add move
+            potentialPosition = new ChessPosition(myPosition.getRow()+2*direction,myPosition.getColumn());
+            if(myPosition.getRow()==startingRow&&(board.getPiece(potentialPosition) == null)) {//If it's the pawn's first move and the spot's open,
+                moves.add(new ChessMove(myPosition,potentialPosition, null));//add move
+            }
+        }
+
+        for (int i = -1; i <=1 ; i+=2) {//for the pawn's left and right side
+            potentialPosition = new ChessPosition(myPosition.getRow()+direction,myPosition.getColumn()+i);
+            if(isInBounds(potentialPosition)&& board.getPiece(potentialPosition)!=null&& board.getPiece(potentialPosition).getTeamColor()!=board.getPiece(myPosition).getTeamColor()){//If the side corners are in bounds and the piece isn't null and the piece is not the same color...
+                moves.add(new ChessMove(myPosition,potentialPosition, null));
+            }
+        }
+
+        if(myPosition.getRow()==promotableRow) {//adds promotion pieces
+            List<ChessMove> promotionMoves = new ArrayList<>();
+            for(ChessMove move:moves){
+                promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.KNIGHT));
+                promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.ROOK));
+                promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.BISHOP));
+                promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.QUEEN));
+            }
+            moves.clear();
+            moves.addAll(promotionMoves);
+        }
+
+        /*if(board.getPiece(myPosition).getTeamColor()== ChessGame.TeamColor.WHITE){//man, pawns are weird
             potentialPosition = new ChessPosition(myPosition.getRow()+1,myPosition.getColumn());
             if(board.getPiece(potentialPosition)==null){//nothing in front of the pawn.
                 moves.add(new ChessMove(myPosition, potentialPosition, null));
@@ -268,7 +310,7 @@ public class ChessPiece {
                 moves.clear();
                 moves.addAll(promotionMoves);
             }
-        }
+        }*/
 
         return moves;
     }
