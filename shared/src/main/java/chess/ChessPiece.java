@@ -224,7 +224,17 @@ public class ChessPiece {
                 }
 
             }
-
+            if(myPosition.getRow()==7) {//adds promotion pieces
+                List<ChessMove> promotionMoves = new ArrayList<>();
+                for(ChessMove move:moves){
+                    promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.KNIGHT));
+                    promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.ROOK));
+                    promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.BISHOP));
+                    promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.QUEEN));
+                }
+                moves.clear();
+                moves.addAll(promotionMoves);
+            }
         }
         if(board.getPiece(myPosition).getTeamColor()== ChessGame.TeamColor.BLACK){//man, pawns are weird
             potentialPosition = new ChessPosition(myPosition.getRow()-1,myPosition.getColumn());
@@ -247,8 +257,19 @@ public class ChessPiece {
                 }
 
             }
-
+            if(myPosition.getRow()==2) {//adds promotion pieces
+                List<ChessMove> promotionMoves = new ArrayList<>();
+                for(ChessMove move:moves){
+                    promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.KNIGHT));
+                    promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.ROOK));
+                    promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.BISHOP));
+                    promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.QUEEN));
+                }
+                moves.clear();
+                moves.addAll(promotionMoves);
+            }
         }
+
         return moves;
     }
 
