@@ -95,14 +95,14 @@ public class ChessPiece {
     private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition){
         List<ChessMove> moves = new ArrayList<>();
         ChessPosition potentialPosition;
-        ChessPiece potentialPositionPiece;
+
 
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 potentialPosition = new ChessPosition(myPosition.getRow()+i,myPosition.getColumn()+j);//Position to consider
 
                 if(isValidMovePosition(board, potentialPosition, board.getPiece(myPosition).getTeamColor())){
-                    moves.add(new ChessMove(myPosition, potentialPosition, PieceType.KNIGHT));
+                    moves.add(new ChessMove(myPosition, potentialPosition, null));
                 }
             }
         }
@@ -120,7 +120,10 @@ public class ChessPiece {
                     potentialPosition = new ChessPosition(myPosition.getRow()+i*distance,myPosition.getColumn()+j*distance);//Position to consider
 
                     if(isValidMovePosition(board, potentialPosition, board.getPiece(myPosition).getTeamColor())){
-                        moves.add(new ChessMove(myPosition, potentialPosition, PieceType.KNIGHT));
+                        moves.add(new ChessMove(myPosition, potentialPosition, null));
+                        if (board.getPiece(potentialPosition)!=null){
+                            break;
+                        }
                     }else{
                         break;
                     }
@@ -140,7 +143,10 @@ public class ChessPiece {
                     potentialPosition = new ChessPosition(myPosition.getRow()+i*distance,myPosition.getColumn()+j*distance);//Position to consider
 
                     if(isValidMovePosition(board, potentialPosition, board.getPiece(myPosition).getTeamColor())){
-                        moves.add(new ChessMove(myPosition, potentialPosition, PieceType.KNIGHT));
+                        moves.add(new ChessMove(myPosition, potentialPosition, null));
+                        if (board.getPiece(potentialPosition)!=null){
+                            break;
+                        }
                     }else{
                         break;
                     }
@@ -153,52 +159,43 @@ public class ChessPiece {
     private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition){
         List<ChessMove> moves = new ArrayList<>();
         ChessPosition potentialPosition;
-        for (int i = -1; i <= 1; i+=2) {
-                int distance = 1;
-                while(true) {
-                    potentialPosition = new ChessPosition(myPosition.getRow()+i*distance,myPosition.getColumn()+0*distance);//Position to consider
 
-                    if(isValidMovePosition(board, potentialPosition, board.getPiece(myPosition).getTeamColor())){
-                        moves.add(new ChessMove(myPosition, potentialPosition, PieceType.KNIGHT));
-                    }else{
-                        break;
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                if(!((i==0)==(j==0))){ //xor i and j. if
+                    int distance = 1;
+                    while(true) {
+                        potentialPosition = new ChessPosition(myPosition.getRow()+i*distance,myPosition.getColumn()+j*distance);//Position to consider
+
+                        if(isValidMovePosition(board, potentialPosition, board.getPiece(myPosition).getTeamColor())){
+                            moves.add(new ChessMove(myPosition, potentialPosition, null));
+                            if (board.getPiece(potentialPosition)!=null){
+                                break;
+                            }
+                        }else{
+                            break;
+                        }
+                        distance++;
                     }
-                    distance++;
                 }
 
-        }
-        for (int j = -1; j <= 1; j+=2) {
-            int distance = 1;
-            while(true) {
-                potentialPosition = new ChessPosition(myPosition.getRow()+0*distance,myPosition.getColumn()+j*distance);//Position to consider
-
-                if(isValidMovePosition(board, potentialPosition, board.getPiece(myPosition).getTeamColor())){
-                    moves.add(new ChessMove(myPosition, potentialPosition, PieceType.KNIGHT));
-                }else{
-                    break;
-                }
-                distance++;
             }
-
         }
         return moves;
+
+
+
     }
     private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition){
         List<ChessMove> moves = new ArrayList<>();
         ChessPosition potentialPosition;
-        for (int i = -1; i <= 1; i+=2) {
-            for (int j = -1; j <= 1; j+=2) {
-                int distance = 1;
-                while(true) {
-                    potentialPosition = new ChessPosition(myPosition.getRow()+i*distance,myPosition.getColumn()+j*distance);//Position to consider
 
-                    if(isValidMovePosition(board, potentialPosition, board.getPiece(myPosition).getTeamColor())){
-                        moves.add(new ChessMove(myPosition, potentialPosition, PieceType.KNIGHT));
-                    }else{
-                        break;
-                    }
-                    distance++;
-                }
+        int[][] knightMoves = {{2,1},{2,-1},{-2,1},{-2,-1},{1,2},{1,-2},{-1,2},{-1,-2}};
+        for(int[] move : knightMoves){
+            potentialPosition = new ChessPosition(myPosition.getRow()+move[0],myPosition.getColumn()+move[1]);//Position to consider
+
+            if(isValidMovePosition(board, potentialPosition, board.getPiece(myPosition).getTeamColor())){
+                moves.add(new ChessMove(myPosition, potentialPosition, null));
             }
         }
         return moves;
@@ -206,20 +203,51 @@ public class ChessPiece {
     private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition){
         List<ChessMove> moves = new ArrayList<>();
         ChessPosition potentialPosition;
-        for (int i = -1; i <= 1; i+=2) {
-            for (int j = -1; j <= 1; j+=2) {
-                int distance = 1;
-                while(true) {
-                    potentialPosition = new ChessPosition(myPosition.getRow()+i*distance,myPosition.getColumn()+j*distance);//Position to consider
-
-                    if(isValidMovePosition(board, potentialPosition, board.getPiece(myPosition).getTeamColor())){
-                        moves.add(new ChessMove(myPosition, potentialPosition, PieceType.KNIGHT));
-                    }else{
-                        break;
+        if(board.getPiece(myPosition).getTeamColor()== ChessGame.TeamColor.WHITE){//man, pawns are weird
+            potentialPosition = new ChessPosition(myPosition.getRow()+1,myPosition.getColumn());
+            if(board.getPiece(potentialPosition)==null){//nothing in front of the pawn.
+                moves.add(new ChessMove(myPosition, potentialPosition, null));
+                if(myPosition.getRow()==2){//pawn hasn't moved yet
+                    potentialPosition = new ChessPosition(myPosition.getRow()+2,myPosition.getColumn());
+                    if(board.getPiece(potentialPosition)==null){//nothing in front of the pawn.
+                        moves.add(new ChessMove(myPosition, potentialPosition, null));
                     }
-                    distance++;
                 }
             }
+            for (int i = -1; i <=1 ; i+=2) {//for the pawn's left and right side
+                potentialPosition = new ChessPosition(myPosition.getRow()+1,myPosition.getColumn()+i);
+                if(potentialPosition.getRow()>=1&&potentialPosition.getRow()<=8&&potentialPosition.getColumn()>=1&&potentialPosition.getColumn()<=8){//Both row and column are between 1 and 8
+                    ChessPiece potentialPositionPiece = board.getPiece(potentialPosition);
+                    if(potentialPositionPiece!=null&&!potentialPositionPiece.getTeamColor().equals(ChessGame.TeamColor.WHITE)){//If the space is NOT empty and occupied by a piece not of the same color.
+                        moves.add(new ChessMove(myPosition, potentialPosition, null));
+                    }
+                }
+
+            }
+
+        }
+        if(board.getPiece(myPosition).getTeamColor()== ChessGame.TeamColor.BLACK){//man, pawns are weird
+            potentialPosition = new ChessPosition(myPosition.getRow()-1,myPosition.getColumn());
+            if(board.getPiece(potentialPosition)==null){//nothing in front of the pawn.
+                moves.add(new ChessMove(myPosition, potentialPosition, null));
+                if(myPosition.getRow()==7){//pawn hasn't moved yet
+                    potentialPosition = new ChessPosition(myPosition.getRow()-2,myPosition.getColumn());
+                    if(board.getPiece(potentialPosition)==null){//nothing in front of the pawn.
+                        moves.add(new ChessMove(myPosition, potentialPosition, null));
+                    }
+                }
+            }
+            for (int i = -1; i <=1 ; i+=2) {//for the pawn's left and right side
+                potentialPosition = new ChessPosition(myPosition.getRow()-1,myPosition.getColumn()+i);
+                if(potentialPosition.getRow()>=1&&potentialPosition.getRow()<=8&&potentialPosition.getColumn()>=1&&potentialPosition.getColumn()<=8){//Both row and column are between 1 and 8
+                    ChessPiece potentialPositionPiece = board.getPiece(potentialPosition);
+                    if(potentialPositionPiece!=null&&!potentialPositionPiece.getTeamColor().equals(ChessGame.TeamColor.BLACK)){//If the space is NOT empty and occupied by a piece not of the same color.
+                        moves.add(new ChessMove(myPosition, potentialPosition, null));
+                    }
+                }
+
+            }
+
         }
         return moves;
     }
