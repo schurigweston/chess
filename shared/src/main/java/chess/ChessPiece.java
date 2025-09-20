@@ -82,37 +82,50 @@ public class ChessPiece {
 
         return moves;
     }
+    private boolean isInBounds(ChessPosition potentialPosition){
+        //Both row and column are between 1 and 8
+        return potentialPosition.getRow() >= 1 && potentialPosition.getRow() <= 8 && potentialPosition.getColumn() >= 1 && potentialPosition.getColumn() <= 8;
+    }
     private boolean isValidMovePosition(ChessBoard board, ChessPosition potentialPosition, ChessGame.TeamColor color){
 
         if(isInBounds(potentialPosition)){//Both row and column are between 1 and 8
             ChessPiece potentialPositionPiece = board.getPiece(potentialPosition);
-            if(potentialPositionPiece==null||!color.equals(potentialPositionPiece.getTeamColor())){//If the space is empty or occupied by a piece not of the same color.
-                return true;
-            }
+            //If the space is empty or occupied by a piece not of the same color.
+            return potentialPositionPiece == null || !color.equals(potentialPositionPiece.getTeamColor());
         }
         return false;
     }
-    private boolean isInBounds(ChessPosition potentialPosition){
-        if(potentialPosition.getRow()>=1&&potentialPosition.getRow()<=8&&potentialPosition.getColumn()>=1&&potentialPosition.getColumn()<=8) {//Both row and column are between 1 and 8
-            return true;
-        }
-        return false;
-    }
-    private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition){
+
+    private Collection<ChessMove> getSlideMoves(ChessBoard board, ChessPosition myPosition, int[][] directions, boolean recurse){
         List<ChessMove> moves = new ArrayList<>();
-        ChessPosition potentialPosition;
 
+        for(int[] direction : directions){
+            int rowDir = direction[0];
+            int colDir = direction[1];
+            int distance = 1;
+            ChessPosition potentialPosition = myPosition;
+            do{
+                potentialPosition = new ChessPosition(myPosition.getRow() + rowDir * distance, myPosition.getColumn() + colDir * distance);
 
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
-                potentialPosition = new ChessPosition(myPosition.getRow()+i,myPosition.getColumn()+j);//Position to consider
-
-                if(isValidMovePosition(board, potentialPosition, board.getPiece(myPosition).getTeamColor())){
+                if(isValidMovePosition(board, potentialPosition, board.getPiece(myPosition).getTeamColor())){//If it's a valid position, add piece, but stop if the position is on a piece.
                     moves.add(new ChessMove(myPosition, potentialPosition, null));
+
+                    if(board.getPiece(potentialPosition) != null) {
+                        break;
+                    }
+                } else {
+                    break;
                 }
-            }
+
+                distance++;
+
+            } while(recurse);
         }
         return moves;
+    }
+    private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition){
+        int[][] directions = {{-1,-1},{-1,0},{-1,1},{0,-1},{0,0},{0,1},{1,-1},{1,0},{1,1}};
+        return getSlideMoves(board,myPosition, directions,false);
     }
     private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition){
         List<ChessMove> moves = new ArrayList<>();
@@ -214,10 +227,7 @@ public class ChessPiece {
         int startingRow = (board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.WHITE) ? 2 : 7;
         int promotableRow = (board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.WHITE) ? 7 : 2;
 
-
-
-
-        potentialPosition = new ChessPosition(myPosition.getRow()+direction,myPosition.getColumn());
+        potentialPosition = new ChessPosition(myPosition.getRow()+direction,myPosition.getColumn());//Consider the spot right it front
         if(board.getPiece(potentialPosition) == null){//the spot in front is empty
             moves.add(new ChessMove(myPosition, potentialPosition, null));//add move
             potentialPosition = new ChessPosition(myPosition.getRow()+2*direction,myPosition.getColumn());
@@ -244,73 +254,6 @@ public class ChessPiece {
             moves.clear();
             moves.addAll(promotionMoves);
         }
-
-        /*if(board.getPiece(myPosition).getTeamColor()== ChessGame.TeamColor.WHITE){//man, pawns are weird
-            potentialPosition = new ChessPosition(myPosition.getRow()+1,myPosition.getColumn());
-            if(board.getPiece(potentialPosition)==null){//nothing in front of the pawn.
-                moves.add(new ChessMove(myPosition, potentialPosition, null));
-                if(myPosition.getRow()==2){//pawn hasn't moved yet
-                    potentialPosition = new ChessPosition(myPosition.getRow()+2,myPosition.getColumn());
-                    if(board.getPiece(potentialPosition)==null){//nothing in front of the pawn.
-                        moves.add(new ChessMove(myPosition, potentialPosition, null));
-                    }
-                }
-            }
-            for (int i = -1; i <=1 ; i+=2) {//for the pawn's left and right side
-                potentialPosition = new ChessPosition(myPosition.getRow()+1,myPosition.getColumn()+i);
-                if(potentialPosition.getRow()>=1&&potentialPosition.getRow()<=8&&potentialPosition.getColumn()>=1&&potentialPosition.getColumn()<=8){//Both row and column are between 1 and 8
-                    ChessPiece potentialPositionPiece = board.getPiece(potentialPosition);
-                    if(potentialPositionPiece!=null&&!potentialPositionPiece.getTeamColor().equals(ChessGame.TeamColor.WHITE)){//If the space is NOT empty and occupied by a piece not of the same color.
-                        moves.add(new ChessMove(myPosition, potentialPosition, null));
-                    }
-                }
-
-            }
-            if(myPosition.getRow()==7) {//adds promotion pieces
-                List<ChessMove> promotionMoves = new ArrayList<>();
-                for(ChessMove move:moves){
-                    promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.KNIGHT));
-                    promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.ROOK));
-                    promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.BISHOP));
-                    promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.QUEEN));
-                }
-                moves.clear();
-                moves.addAll(promotionMoves);
-            }
-        }
-        if(board.getPiece(myPosition).getTeamColor()== ChessGame.TeamColor.BLACK){//man, pawns are weird
-            potentialPosition = new ChessPosition(myPosition.getRow()-1,myPosition.getColumn());
-            if(board.getPiece(potentialPosition)==null){//nothing in front of the pawn.
-                moves.add(new ChessMove(myPosition, potentialPosition, null));
-                if(myPosition.getRow()==7){//pawn hasn't moved yet
-                    potentialPosition = new ChessPosition(myPosition.getRow()-2,myPosition.getColumn());
-                    if(board.getPiece(potentialPosition)==null){//nothing in front of the pawn.
-                        moves.add(new ChessMove(myPosition, potentialPosition, null));
-                    }
-                }
-            }
-            for (int i = -1; i <=1 ; i+=2) {//for the pawn's left and right side
-                potentialPosition = new ChessPosition(myPosition.getRow()-1,myPosition.getColumn()+i);
-                if(potentialPosition.getRow()>=1&&potentialPosition.getRow()<=8&&potentialPosition.getColumn()>=1&&potentialPosition.getColumn()<=8){//Both row and column are between 1 and 8
-                    ChessPiece potentialPositionPiece = board.getPiece(potentialPosition);
-                    if(potentialPositionPiece!=null&&!potentialPositionPiece.getTeamColor().equals(ChessGame.TeamColor.BLACK)){//If the space is NOT empty and occupied by a piece not of the same color.
-                        moves.add(new ChessMove(myPosition, potentialPosition, null));
-                    }
-                }
-
-            }
-            if(myPosition.getRow()==2) {//adds promotion pieces
-                List<ChessMove> promotionMoves = new ArrayList<>();
-                for(ChessMove move:moves){
-                    promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.KNIGHT));
-                    promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.ROOK));
-                    promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.BISHOP));
-                    promotionMoves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(),PieceType.QUEEN));
-                }
-                moves.clear();
-                moves.addAll(promotionMoves);
-            }
-        }*/
 
         return moves;
     }
