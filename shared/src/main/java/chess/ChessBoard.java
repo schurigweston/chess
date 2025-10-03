@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -71,6 +73,24 @@ public class ChessBoard {
         return board[position.getRow()-1][position.getColumn()-1];
     }
 
+    public void movePiece(ChessMove move){
+        addPiece(move.getEndPosition(), getPiece(move.getStartPosition()));
+        addPiece(move.getStartPosition(), null);
+    }
+
+    public Collection<ChessPosition> getPiecePositions(ChessPiece piece){
+        ArrayList<ChessPosition> piecePositions = new ArrayList<ChessPosition>();
+        ChessPosition position;
+        for(int row=1;row<=8;row++){
+            for(int col=1;col<=8;col++){
+                position = new ChessPosition(row, col);
+                if(getPiece(position)!= null && getPiece(position).equals(piece)) {
+                    piecePositions.add(position);
+                }
+            }
+        }
+        return piecePositions;
+    }
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
@@ -149,5 +169,14 @@ public class ChessBoard {
 
         }
         return boardString.toString();
+    }
+    public ChessBoard copy(){
+        ChessBoard newBoard = new ChessBoard();
+        for(int row=0;row<8;row++){
+            for(int col=0;col<8;col++){
+                newBoard.board[row][col]=board[row][col];
+            }
+        }
+        return newBoard;
     }
 }
