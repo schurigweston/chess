@@ -1,7 +1,9 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.*;
 import dataaccess.DataAccessException;
+import dataaccess.MemoryDataAccess;
 import datamodel.*;
 import io.javalin.*;
 import io.javalin.http.Context;
@@ -10,6 +12,8 @@ import service.*;
 public class Server {
 
     private final Javalin javalin;
+    DataAccess db = new MemoryDataAccess();
+    UserService userService = new UserService(db);
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
@@ -30,9 +34,8 @@ public class Server {
 
     private void addUser(Context ctx) throws DataAccessException {
         RegisterRequest request = new Gson().fromJson(ctx.body(), RegisterRequest.class);
-        RegisterResult result = UserService.register(request);
+        RegisterResult result = userService.register(request);
         ctx.json(result);
-
 
     }
 }

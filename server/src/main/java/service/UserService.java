@@ -1,14 +1,28 @@
 package service;
 
 import datamodel.*;
+import dataaccess.*;
 
 public class UserService {
-    public static RegisterResult register(RegisterRequest registerRequest) {
+    private final DataAccess db;
+
+    public UserService(DataAccess db) {
+        this.db = db;
+    }
+
+    public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
+        UserData user = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
+        db.createUser(user);
         RegisterResult result = new RegisterResult(registerRequest.username(), "Auther");
+        //add logic for if it works or not.
         return result;
     }
     public static LoginResult login(LoginRequest loginRequest) {
-        return null; //BAD
+        LoginResult result = new LoginResult(loginRequest.username(), "Auther");
+        //add logic for if it works or not.
+        return result;
     }
-    public static void logout(LogoutRequest logoutRequest) {}
+    public static void logout(LogoutRequest logoutRequest) {
+        //if username and authtoken are correct, then... remove authtoken from database?
+    }
 }
