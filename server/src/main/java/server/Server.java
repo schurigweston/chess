@@ -80,13 +80,16 @@ public class Server {
 
     private void logoutUser(@NotNull Context ctx) {
         try {
-            LogoutRequest request = new Gson().fromJson(ctx.body(), LogoutRequest.class);
+            String authToken = ctx.header("authorization"); // get authToken from header
+            LogoutRequest request = new LogoutRequest(authToken);
             userService.logout(request);
             ctx.status(200).json(Map.of()); // empty I guess
         } catch (DataAccessException e) {
             String msg = e.getMessage();
             if (msg.contains("unauthorized")) {
                 ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+            } else if (msg.contains("bad request")) {
+                ctx.status(400).json(Map.of("message", msg));
             } else {
                 ctx.status(500).json(Map.of("message", msg));
             }

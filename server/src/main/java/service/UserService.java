@@ -52,13 +52,15 @@ public class UserService {
 
     public void logout(LogoutRequest logoutRequest) throws DataAccessException {
         //if username and authtoken are correct, then... remove authtoken from database?
-        if(logoutRequest.authToken() == null) { //if there is no authToken provided...
+        if (logoutRequest == null || logoutRequest.authToken() == null) {
             throw new DataAccessException("Error: bad request");
         }
+
         String authToken = logoutRequest.authToken();
-        if(db.getAuth(authToken) == null){
+        if (db.getAuth(authToken) == null) {
             throw new DataAccessException("Error: unauthorized");
         }
+
         db.deleteAuth(db.getAuth(authToken));
     }
 
