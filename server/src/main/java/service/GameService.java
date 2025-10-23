@@ -45,6 +45,7 @@ public class GameService {
     }
 
     public CreateResult createGame(CreateRequest request) throws DataAccessException {
+        //Comment
         if (request.authToken() == null || db.getAuth(request.authToken()) == null) {
             throw new DataAccessException("Error: unauthorized");
         }

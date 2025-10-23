@@ -92,6 +92,7 @@ public class Server {
                 ctx.status(400).json(Map.of("message", msg));
             } else {
                 ctx.status(500).json(Map.of("message", msg));
+
             }
         }
     }
