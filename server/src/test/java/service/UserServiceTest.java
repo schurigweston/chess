@@ -58,16 +58,23 @@ public class UserServiceTest {
 
         LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
 
+        LoginResult result = userService.login(loginRequest);
 
-        LoginResult result = userService.login(loginRequest); // or userService.login(loginRequest) depending on where login is implemented
-
-        // Assert: check that login result is not null and contains the correct username
         assertNotNull(result);
         assertEquals(user.username(), result.username());
-        assertNotNull(result.authToken()); // authToken should be generated
+        assertNotNull(result.authToken());
+        System.out.println(result);
     }
     @Test
     void loginBadUser() throws DataAccessException{
+        LoginRequest badUser = new LoginRequest("nonexistent", "pass");
+
+
+        DataAccessException thrown = assertThrows(DataAccessException.class, () -> {
+            userService.login(badUser);
+        });
+
+        assertTrue(thrown.getMessage().contains("Username or Password does not exist"));
 
     }
     @Test

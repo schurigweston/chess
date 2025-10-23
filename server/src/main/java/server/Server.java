@@ -40,46 +40,52 @@ public class Server {
 
     }
 
-    private void addUser(@NotNull Context ctx) throws DataAccessException {
-
-        try{
+    private void addUser(@NotNull Context ctx) {
+        try {
             RegisterRequest request = new Gson().fromJson(ctx.body(), RegisterRequest.class);
             RegisterResult result = userService.register(request);
             ctx.status(200).json(result);
-        }
-        catch(DataAccessException e){
-            String errormsg = e.getMessage();
-            if(errormsg.contains("already exists")){ ctx.status(403);}
-            else if(errormsg.contains("bad request")){ ctx.status(400);}
-            else{ctx.json(errormsg);}
+        } catch (DataAccessException e) {
+            String msg = e.getMessage();
+            if (msg.contains("already taken")) {
+                ctx.status(403).json(Map.of("message", "Error: already taken"));
+            } else if (msg.contains("bad request")) {
+                ctx.status(400).json(Map.of("message", "Error: bad request"));
+            } else {
+                ctx.status(500).json(Map.of("message", msg));
+            }
         }
     }
 
-    private void loginUser(@NotNull Context ctx) throws DataAccessException {
-        try{
+    private void loginUser(@NotNull Context ctx) {
+        try {
             LoginRequest request = new Gson().fromJson(ctx.body(), LoginRequest.class);
             LoginResult result = userService.login(request);
             ctx.status(200).json(result);
-        }
-        catch(DataAccessException e){
-            String errormsg = e.getMessage();
-            if(errormsg.contains("does not exist")){ ctx.status(401);}
-            else if(errormsg.contains("bad request")){ ctx.status(400);}
-            else{ctx.json(errormsg);}
+        } catch (DataAccessException e) {
+            String msg = e.getMessage();
+            if (msg.contains("does not exist")) {
+                ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+            } else if (msg.contains("bad request")) {
+                ctx.status(400).json(Map.of("message", "Error: bad request"));
+            } else {
+                ctx.status(500).json(Map.of("message", msg));
+            }
         }
     }
 
     private void logoutUser(@NotNull Context ctx) {
-        try{
+        try {
             LogoutRequest request = new Gson().fromJson(ctx.body(), LogoutRequest.class);
             userService.logout(request);
-            ctx.status(200);
-        }
-        catch(DataAccessException e){
-            String errormsg = e.getMessage();
-            if(errormsg.contains("unauthorized")){ ctx.status(401);}
-            else if(errormsg.contains("bad request")){ ctx.status(400);}
-            else{ctx.json(errormsg);}
+            ctx.status(200).json(Map.of()); // empty I guess
+        } catch (DataAccessException e) {
+            String msg = e.getMessage();
+            if (msg.contains("unauthorized")) {
+                ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+            } else {
+                ctx.status(500).json(Map.of("message", msg));
+            }
         }
     }
 
