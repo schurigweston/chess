@@ -20,27 +20,68 @@ public class GameServiceTest {
     }
 
     @Test
-    void listGameSummarysHappy() throws DataAccessException {
+    void listGamesHappy() throws DataAccessException {
 
         UserData user = new UserData("johndoe", "pass", "j@d");
         db.createUser(user);
         AuthData auth = new AuthData("token", user.username());
         db.createAuth(auth);
 
+        Collection<GameData> games = gameService.listGames(auth.authToken());
+
+        assertNotNull(games);
+        assertTrue(games.isEmpty());
+    }
+    @Test
+    void listGamesSad() {
+
+        try {
+            gameService.listGames("badtoken");
+            fail("Expected a DataAccessException to be thrown");
+        } catch (DataAccessException e) {
+            assertTrue(e.getMessage().contains("unauthorized"));
+        }
+    }
+    @Test
+    void listGameSummariesHappy() throws DataAccessException {
+
+        UserData user = new UserData("johndoe", "pass", "j@d");
+        db.createUser(user);
+        AuthData auth = new AuthData("token", user.username());
+        db.createAuth(auth);
 
         ListResult games = gameService.listGameSummaries(new ListRequest(auth.authToken()));
-
 
         assertNotNull(games);
         assertTrue(games.games().isEmpty());
     }
+    @Test
+    void listGameSummariesSad() {
+        ListRequest request = new ListRequest("invalid-token");
+
+        try {
+            gameService.listGameSummaries(request);
+            fail("Expected a DataAccessException to be thrown");
+        } catch (DataAccessException e) {
+            assertEquals("Error: unauthorized", e.getMessage());
+        }
+    }
 
     @Test
-    void listGameSummarysSadUnauthorized() {
-        // Act & Assert: using a null or invalid auth token throws DataAccessException
-        DataAccessException exception = assertThrows(DataAccessException.class, () -> gameService.listGames("badtoken"));
+    void createGameHappy() throws DataAccessException {
+        UserData user = new UserData("johndoe", "pass", "j@d");
+        db.createUser(user);
+        AuthData auth = new AuthData("token", user.username());
+        db.createAuth(auth);
 
-        assertTrue(exception.getMessage().contains("unauthorized"));
+        CreateRequest request = new CreateRequest(auth.authToken(), "TestGame");
+        CreateResult result = gameService.createGame(request);
+
+        assertNotNull(result);
+        assertTrue(result.gameID() > 0);
+        assertEquals("TestGame", db.getGame(result.gameID()).gameName());
     }
+
+
 
 }
