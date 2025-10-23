@@ -44,8 +44,16 @@ public class GameService {
         return new ListResult(summaries);
     }
 
-    public void createGame(){
-
+    public CreateResult createGame(CreateRequest request) throws DataAccessException {
+        if (request.authToken() == null || request.authToken().isEmpty()) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+        if (request.gameName() == null || request.gameName().isEmpty()) {
+            throw new DataAccessException("Error: bad request");
+        }
+        int gameID = db.createGame(request.gameName());
+        CreateResult result = new CreateResult(gameID);
+        return result;
     }
 
     public void joinGame(){

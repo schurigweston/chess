@@ -106,7 +106,23 @@ public class Server {
 
 
     private void createGame(@NotNull Context ctx) {
+        try {
+            CreateRequest body = new Gson().fromJson(ctx.body(), CreateRequest.class);
+            CreateRequest request = new CreateRequest(ctx.header("authorization"), body.gameName());
 
+            CreateResult result = gameService.createGame(request);
+            ctx.status(200).json(result);;
+        } catch (DataAccessException e) {
+            String msg = e.getMessage();
+            if (msg.contains("bad request")) {
+                ctx.status(400).json(Map.of("message", "Error: bad request"));
+            }
+            else if (msg.contains("unauthorized")) {
+                ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+            } else {
+                ctx.status(500).json(Map.of("message", msg));
+            }
+        }
     }
 
     private void joinGame(@NotNull Context ctx) {
