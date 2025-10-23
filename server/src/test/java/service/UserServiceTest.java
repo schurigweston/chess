@@ -1,11 +1,10 @@
 package service;
 
 import dataaccess.*;
-import datamodel.*;
+import model.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.UserService;
 
 import java.util.Collection;
 
@@ -20,6 +19,17 @@ public class UserServiceTest {
     }
 
     @Test
+    void clearUsers() throws DataAccessException {
+        UserData user = new UserData("johndoe", "pass", "j@d");
+
+        RegisterResult result = userService.register(new RegisterRequest(user.username(), user.password(), user.email()));
+
+        userService.clear();
+        Collection<UserData> users = userService.listUsers();
+        assertTrue(users.isEmpty());
+    }
+
+    @Test
     void addUser() throws DataAccessException {
         UserData user = new UserData("johndoe", "pass", "j@d");
 
@@ -28,6 +38,16 @@ public class UserServiceTest {
         Collection<UserData> users = userService.listUsers();
         assertEquals(1, users.size());
         assertTrue(users.contains(user));
+    }
+
+    @Test
+    void addDuplicate() throws DataAccessException{
+        UserData john = new UserData("johndoe", "pass", "j@d");
+
+
+        userService.register(new RegisterRequest(john.username(), john.password(), john.email()));
+        assertThrows(DataAccessException.class, () -> userService.register(new RegisterRequest(john.username(), john.password(), john.email())));
+
     }
 
 }
