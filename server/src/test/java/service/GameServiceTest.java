@@ -126,6 +126,33 @@ public class GameServiceTest {
         assertNull(game.blackUsername());
     }
 
+    @Test
+    void joinGameSadUnauthorized() {
+        JoinRequest request = new JoinRequest("badtoken", "WHITE", 1);
+        try {
+            gameService.joinGame(request);
+            fail("Expected a DataAccessException to be thrown");
+        } catch (DataAccessException e) {
+            assertEquals("Error: unauthorized", e.getMessage());
+        }
+    }
+
+    @Test
+    void joinGameSadBadRequest() throws DataAccessException {
+        UserData user = new UserData("johndoe", "pass", "j@d");
+        db.createUser(user);
+        AuthData auth = new AuthData("token", user.username());
+        db.createAuth(auth);
+
+        JoinRequest request = new JoinRequest(auth.authToken(), "RED", 999);
+        try {
+            gameService.joinGame(request);
+            fail("Expected a DataAccessException to be thrown");
+        } catch (DataAccessException e) {
+            assertEquals("Error: bad request", e.getMessage());
+        }
+    }
+
 
 
 }
