@@ -21,7 +21,7 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void createUser(UserData user) throws DataAccessException {
+    public void createUser(UserData user) {
         users.put(user.username(), user);
     }
 
@@ -43,9 +43,9 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public ChessGame getGame(String gameID) {
-        GameData gameData = games.get(Integer.valueOf(gameID));
-        return gameData != null ? gameData.game() : null;
+    public GameData getGame(int gameID) {
+        GameData gameData = games.get(gameID);
+        return gameData;
     }
 
     @Override
@@ -54,8 +54,8 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void updateGame() {
-
+    public void updateGame(GameData updatedGame) {
+        games.put(updatedGame.gameID(), updatedGame);
     }
 
 

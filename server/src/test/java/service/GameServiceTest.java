@@ -11,15 +11,16 @@ import java.util.Collection;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameServiceTest {
-    static final GameService gameService = new GameService(new MemoryDataAccess());
+
     static final DataAccess db = new MemoryDataAccess();
+    static final GameService gameService = new GameService(db);
     @BeforeEach
     void clear() {
         gameService.clear();
     }
 
     @Test
-    void listGamesHappy() throws DataAccessException {
+    void listGameSummarysHappy() throws DataAccessException {
 
         UserData user = new UserData("johndoe", "pass", "j@d");
         db.createUser(user);
@@ -27,15 +28,15 @@ public class GameServiceTest {
         db.createAuth(auth);
 
 
-        Collection<GameData> games = gameService.listGames(auth.authToken());
+        ListResult games = gameService.listGameSummaries(new ListRequest(auth.authToken()));
 
 
         assertNotNull(games);
-        assertTrue(games.isEmpty());
+        assertTrue(games.games().isEmpty());
     }
 
     @Test
-    void listGamesSadUnauthorized() {
+    void listGameSummarysSadUnauthorized() {
         // Act & Assert: using a null or invalid auth token throws DataAccessException
         DataAccessException exception = assertThrows(DataAccessException.class, () -> gameService.listGames("badtoken"));
 

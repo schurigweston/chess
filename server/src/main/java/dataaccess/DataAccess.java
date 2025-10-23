@@ -9,7 +9,7 @@ public interface DataAccess {
 
     void clear();
 
-    void createUser(UserData user) throws DataAccessException;
+    void createUser(UserData user);
 
     UserData getUser(String username);
 
@@ -17,11 +17,11 @@ public interface DataAccess {
 
     int createGame(String gameName);
 
-    ChessGame getGame(String gameID);
+    GameData getGame(int gameID);
 
     Collection<GameData> listGames();
 
-    void updateGame(); // needs more
+    void updateGame(GameData updatedGame);
 
     void createAuth(AuthData authData);
 

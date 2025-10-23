@@ -94,7 +94,7 @@ public class Server {
             ListRequest request = new ListRequest(ctx.header("authorization"));
             //String authToken = ctx.header("authorization");
             var games = gameService.listGameSummaries(request);
-            ctx.status(200).json(games);;
+            ctx.status(200).json(games);
         } catch (DataAccessException e) {
             if (e.getMessage().contains("unauthorized")) {
                 ctx.status(401).json(Map.of("message", "Error: unauthorized"));
@@ -111,7 +111,7 @@ public class Server {
             CreateRequest request = new CreateRequest(ctx.header("authorization"), body.gameName());
 
             CreateResult result = gameService.createGame(request);
-            ctx.status(200).json(result);;
+            ctx.status(200).json(result);
         } catch (DataAccessException e) {
             String msg = e.getMessage();
             if (msg.contains("bad request")) {
@@ -126,7 +126,27 @@ public class Server {
     }
 
     private void joinGame(@NotNull Context ctx) {
+        try {
+            JoinRequest body = new Gson().fromJson(ctx.body(), JoinRequest.class);
+            JoinRequest request = new JoinRequest(ctx.header("authorization"), body.playerColor(), body.gameID());
 
+            gameService.joinGame(request);
+            ctx.status(200);
+        } catch (DataAccessException e) {
+            String msg = e.getMessage();
+            if (msg.contains("bad request")) {
+                ctx.status(400).json(Map.of("message", "Error: bad request"));
+            }
+            else if (msg.contains("unauthorized")) {
+                ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+            }
+            else if (msg.contains("already taken")) {
+                ctx.status(403).json(Map.of("message", "Error: already taken"));
+            }
+            else {
+                ctx.status(500).json(Map.of("message", msg));
+            }
+        }
     }
 
 
