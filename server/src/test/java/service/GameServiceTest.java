@@ -109,6 +109,23 @@ public class GameServiceTest {
         }
     }
 
+    @Test
+    void joinGameHappy() throws DataAccessException {
+        UserData user = new UserData("johndoe", "pass", "j@d");
+        db.createUser(user);
+        AuthData auth = new AuthData("token", user.username());
+        db.createAuth(auth);
+
+        int gameID = db.createGame("TestGame");
+
+        JoinRequest request = new JoinRequest(auth.authToken(), "WHITE", gameID);
+        gameService.joinGame(request);
+
+        GameData game = db.getGame(gameID);
+        assertEquals(user.username(), game.whiteUsername());
+        assertNull(game.blackUsername());
+    }
+
 
 
 }
