@@ -29,20 +29,40 @@ public class UserService {
 
         db.createAuth(new AuthData(authToken, user.username()));
 
-        RegisterResult result = new RegisterResult(registerRequest.username(), "Auther");
-        //add logic for if it works or not.
+        RegisterResult result = new RegisterResult(registerRequest.username(), authToken);
+
         return result;
     }
-    public LoginResult login(LoginRequest loginRequest) {
-        LoginResult result = new LoginResult(loginRequest.username(), "Auther");
-        //add logic for if it works or not.
+    public LoginResult login(LoginRequest loginRequest) throws DataAccessException{
+        if(loginRequest.username() == null || loginRequest.password() == null) { //if there is no username or password provided...
+            throw new DataAccessException("Error: bad request");
+        }
+        if(db.getUser(loginRequest.username()) == null || !db.getUser(loginRequest.username()).password().equals(loginRequest.password())){ //If the username doesn't exist or the password doesn't match for that username...
+            throw new DataAccessException("Error: Username or Password does not exist");
+        }
+
+        String authToken = UUID.randomUUID().toString();
+
+        db.createAuth(new AuthData(authToken, loginRequest.username()));
+
+        LoginResult result = new LoginResult(loginRequest.username(), authToken);
+
         return result;
-    }
-    public void logout(LogoutRequest logoutRequest) {
-        //if username and authtoken are correct, then... remove authtoken from database?
     }
 
-    public Collection<UserData> listUsers() {
+    public void logout(LogoutRequest logoutRequest) throws DataAccessException {
+        //if username and authtoken are correct, then... remove authtoken from database?
+        if(logoutRequest.authToken() == null) { //if there is no authToken provided...
+            throw new DataAccessException("Error: bad request");
+        }
+        String authToken = logoutRequest.authToken();
+        if(db.getAuth(authToken) == null){
+            throw new DataAccessException("Error: unauthorized");
+        }
+        db.deleteAuth(db.getAuth(authToken));
+    }
+
+    public Collection<UserData> listUsers()throws DataAccessException {
         return db.listUsers();
     }
 

@@ -50,4 +50,33 @@ public class UserServiceTest {
 
     }
 
+    @Test
+    void loginUser() throws DataAccessException{
+        UserData user = new UserData("johndoe", "pass", "j@d");
+
+        userService.register(new RegisterRequest(user.username(), user.password(), user.email()));
+
+        LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
+
+
+        LoginResult result = userService.login(loginRequest); // or userService.login(loginRequest) depending on where login is implemented
+
+        // Assert: check that login result is not null and contains the correct username
+        assertNotNull(result);
+        assertEquals(user.username(), result.username());
+        assertNotNull(result.authToken()); // authToken should be generated
+    }
+    @Test
+    void loginBadUser() throws DataAccessException{
+
+    }
+    @Test
+    void logoutUser() throws  DataAccessException{
+
+    }
+    @Test
+    void logoutBadUser() throws  DataAccessException{
+
+    }
+
 }
