@@ -153,6 +153,29 @@ public class GameServiceTest {
         }
     }
 
+    @Test
+    void joinGameSadAlreadyTaken() throws DataAccessException {
+        UserData user1 = new UserData("user1", "pass", "u1@d");
+        db.createUser(user1);
+        AuthData auth1 = new AuthData("token1", user1.username());
+        db.createAuth(auth1);
 
+        UserData user2 = new UserData("user2", "pass", "u2@d");
+        db.createUser(user2);
+        AuthData auth2 = new AuthData("token2", user2.username());
+        db.createAuth(auth2);
+
+        int gameID = db.createGame("TestGame");
+        JoinRequest request1 = new JoinRequest(auth1.authToken(), "WHITE", gameID);
+        gameService.joinGame(request1);
+
+        JoinRequest request2 = new JoinRequest(auth2.authToken(), "WHITE", gameID);
+        try {
+            gameService.joinGame(request2);
+            fail("Expected a DataAccessException to be thrown");
+        } catch (DataAccessException e) {
+            assertEquals("Error: already taken", e.getMessage());
+        }
+    }
 
 }
