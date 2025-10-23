@@ -82,6 +82,33 @@ public class GameServiceTest {
         assertEquals("TestGame", db.getGame(result.gameID()).gameName());
     }
 
+    @Test
+    void createGameSadUnauthorized() {
+        CreateRequest request = new CreateRequest("badtoken", "TestGame");
+        try {
+            gameService.createGame(request);
+            fail("Expected a DataAccessException to be thrown");
+        } catch (DataAccessException e) {
+            assertEquals("Error: unauthorized", e.getMessage());
+        }
+    }
+
+    @Test
+    void createGameSadBadRequest() throws DataAccessException {
+        UserData user = new UserData("johndoe", "pass", "j@d");
+        db.createUser(user);
+        AuthData auth = new AuthData("token", user.username());
+        db.createAuth(auth);
+
+        CreateRequest request = new CreateRequest(auth.authToken(), null);
+        try {
+            gameService.createGame(request);
+            fail("Expected a DataAccessException to be thrown");
+        } catch (DataAccessException e) {
+            assertEquals("Error: bad request", e.getMessage());
+        }
+    }
+
 
 
 }
