@@ -91,9 +91,10 @@ public class Server {
 
     private void listGames(@NotNull Context ctx) {
         try {
-            String authToken = ctx.header("authorization");
-            var games = gameService.listGames(authToken);
-            ctx.status(200).json(Map.of("games", games));;
+            ListRequest request = new ListRequest(ctx.header("authorization"));
+            //String authToken = ctx.header("authorization");
+            var games = gameService.listGameSummaries(request);
+            ctx.status(200).json(games);;
         } catch (DataAccessException e) {
             if (e.getMessage().contains("unauthorized")) {
                 ctx.status(401).json(Map.of("message", "Error: unauthorized"));
