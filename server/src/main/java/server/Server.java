@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
+import io.javalin.json.JavalinGson;
 import model.*;
 import io.javalin.*;
 import io.javalin.http.Context;
@@ -20,7 +21,10 @@ public class Server {
     GameService gameService = new GameService(db);
 
     public Server() {
-        javalin = Javalin.create(config -> config.staticFiles.add("web"));
+        javalin = Javalin.create(config -> {
+            config.staticFiles.add("web");           // keep your static files
+            config.jsonMapper(new JavalinGson());    // add this for JSON support
+        });
         javalin.delete("/db", ctx -> clearDatabase(ctx));
         javalin.post("/user", ctx -> addUser(ctx));
         javalin.post("/session", ctx -> loginUser(ctx));
