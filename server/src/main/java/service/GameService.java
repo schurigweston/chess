@@ -13,7 +13,7 @@ public class GameService {
         this.db = db;
     }
 
-    public void clear() {
+    public void clear(){
         db.clear();
     }
 

@@ -25,6 +25,27 @@ public class MySQLDataAccess implements DataAccess{
               `email` varchar(256) Not Null,
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS  auths (
+                `id` int NOT NULL AUTO_INCREMENT,
+                `authToken` varchar(256) NOT NULL UNIQUE,
+                `username` varchar(256) NOT NULL,
+                PRIMARY KEY (`id`),
+                FOREIGN KEY (`username`) REFERENCES users(username)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS  games (
+                `id` int NOT NULL AUTO_INCREMENT,
+                `whiteUsername` varchar(256) NOT NULL,
+                `blackUsername` varchar(256) NOT NULL,
+                `gameName` varchar(256) NOT NULL,
+                `game` TEXT NOT NULL,
+                PRIMARY KEY (`id`),
+                FOREIGN KEY (`whiteUsername`) REFERENCES users(username),
+                FOREIGN KEY (`blackUsername`) REFERENCES users(username)
+               ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
 
@@ -43,8 +64,14 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     @Override
-    public void clear() {
-
+    public void clear(){
+        try (Connection conn = DatabaseManager.getConnection()) {
+            conn.prepareStatement("DELETE from auths").execute();
+            conn.prepareStatement("DELETE from games").execute();
+            conn.prepareStatement("DELETE from users").execute();
+        } catch (Exception ex) {
+            throw new RuntimeException("Unable to clear database", ex);
+        }
     }
 
     @Override
