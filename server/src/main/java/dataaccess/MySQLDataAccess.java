@@ -64,7 +64,7 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     @Override
-    public void clear(){
+    public void clear() throws DataAccessException{
         try (Connection conn = DatabaseManager.getConnection()) {
             conn.prepareStatement("DELETE from auths").execute();
             conn.prepareStatement("DELETE from games").execute();

@@ -69,6 +69,10 @@ public class UserService {
     }
 
     public void clear() {
-        db.clear();
+        try {
+            db.clear();
+        } catch (DataAccessException e) {
+            System.err.println("Failed to clear database: " + e.getMessage());
+        }
     }
 }

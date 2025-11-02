@@ -13,14 +13,23 @@ import service.*;
 
 import java.util.Map;
 
-public class Server {
+public class Server{
 
     private final Javalin javalin;
-    DataAccess db = new MemoryDataAccess();
-    UserService userService = new UserService(db);
-    GameService gameService = new GameService(db);
+    private final DataAccess db;// = new MySQLDataAccess();
+    private final UserService userService;// = new UserService(db);
+    private final GameService gameService;// = new GameService(db);
 
     public Server() {
+        DataAccess tempDB; //create Database with mySQL if it works, otherwise use memoryDataAccess
+        try{
+            tempDB = new MySQLDataAccess();
+        } catch (DataAccessException e){
+            tempDB = new MemoryDataAccess();
+        }
+        this.db = tempDB;
+        userService = new UserService(db);
+        gameService = new GameService(db);
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");           // keep your static files
             config.jsonMapper(new JavalinGson());    // add this for JSON support

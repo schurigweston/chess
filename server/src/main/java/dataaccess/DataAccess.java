@@ -7,7 +7,7 @@ import java.util.Collection;
 
 public interface DataAccess {
 
-    void clear();
+    void clear() throws DataAccessException;
 
     void createUser(UserData user);
 

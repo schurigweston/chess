@@ -13,8 +13,12 @@ public class GameService {
         this.db = db;
     }
 
-    public void clear(){
-        db.clear();
+    public void clear() {
+        try {
+            db.clear();
+        } catch (DataAccessException e) {
+            System.err.println("Failed to clear database: " + e.getMessage());
+        }
     }
 
     public Collection<GameData> listGames(String authToken) throws DataAccessException {
