@@ -11,7 +11,7 @@ public interface DataAccess {
 
     void createUser(UserData user) throws DataAccessException;
 
-    UserData getUser(String username);
+    UserData getUser(String username) throws DataAccessException;
 
     Collection<UserData> listUsers();
 
