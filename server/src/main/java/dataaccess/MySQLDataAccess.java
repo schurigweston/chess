@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.sql.*;
 
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+
 public class MySQLDataAccess implements DataAccess{
 
 
@@ -70,17 +72,20 @@ public class MySQLDataAccess implements DataAccess{
             conn.prepareStatement("DELETE from games").execute();
             conn.prepareStatement("DELETE from users").execute();
         } catch (Exception ex) {
-            throw new RuntimeException("Unable to clear database", ex);
+            throw new DataAccessException("Unable to clear database", ex);
         }
     }
 
     @Override
-    public void createUser(UserData user) { //make sure that user is unique. I didn't do that with memory database.
-
+    public void createUser(UserData user) throws DataAccessException{ //make sure that user is unique. I didn't do that with memory database.
+        //conn.prepareStatement("INSERT INTO users values (1, " + user.username() + "," + user.password() + "," + user.email() + ")"); //Bad, unsafe
+        String query = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+        executeUpdate(query, user.username(), user.password(), user.email()); //This line returns an integer, the ID of the new user, if I ever need to use it.
     }
 
     @Override
     public UserData getUser(String username) {
+
         return null;
     }
 
@@ -122,5 +127,28 @@ public class MySQLDataAccess implements DataAccess{
     @Override
     public void deleteAuth(AuthData authData) {
 
+    }
+
+    private int executeUpdate(String statement, Object... params) throws DataAccessException { //Lol yoinked from pet shop.
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                for (int i = 0; i < params.length; i++) {
+                    Object param = params[i];
+                    if (param instanceof String p) ps.setString(i + 1, p);
+                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
+
+                }
+                ps.executeUpdate();
+
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+
+                return 0;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
     }
 }

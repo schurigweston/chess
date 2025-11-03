@@ -33,6 +33,7 @@ public class UserService {
 
         return result;
     }
+
     public LoginResult login(LoginRequest loginRequest) throws DataAccessException{
         if(loginRequest.username() == null || loginRequest.password() == null) { //if there is no username or password provided...
             throw new DataAccessException("Error: bad request");
