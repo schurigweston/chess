@@ -7,6 +7,7 @@ import model.UserData;
 import java.util.Collection;
 import java.util.List;
 import java.sql.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
@@ -79,8 +80,10 @@ public class MySQLDataAccess implements DataAccess{
     @Override
     public void createUser(UserData user) throws DataAccessException{ //make sure that user is unique. I didn't do that with memory database.
         //conn.prepareStatement("INSERT INTO users values (1, " + user.username() + "," + user.password() + "," + user.email() + ")"); //Bad, unsafe
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         String query = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
-        executeUpdate(query, user.username(), user.password(), user.email()); //This line returns an integer, the ID of the new user, if I ever need to use it.
+        executeUpdate(query, user.username(), hashedPassword, user.email()); //This line returns an integer, the ID of the new user, if I ever need to use it.
+
     }
 
     @Override
