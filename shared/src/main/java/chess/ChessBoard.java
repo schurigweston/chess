@@ -127,7 +127,7 @@ public class ChessBoard {
             return false;
         }
         ChessBoard that = (ChessBoard) o;
-        if (this == o) return true;
+        if (this == o) {return true;}
         //System.out.println("this board:\n" + this.toStringBoard());
         //System.out.println("that board:\n" + that.toStringBoard());
         for (int i = 1; i <= 8; i++) {
