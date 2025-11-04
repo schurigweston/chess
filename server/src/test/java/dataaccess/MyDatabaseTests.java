@@ -31,6 +31,16 @@ public class MyDatabaseTests {
         db.clear();
     }
 
+    @BeforeEach
+    public void clearDB() throws DataAccessException{
+        db.clear();
+    }
+
+    @AfterEach
+    public void clearDBEnd() throws DataAccessException{
+        db.clear();
+    }
+
     @Test
     void testClear() throws DataAccessException{ //relies on createUser and getUser. Make sure those also work.
         db.createUser(user1);
@@ -83,7 +93,7 @@ public class MyDatabaseTests {
     }
 
     @Test
-    void listUsers() throws DataAccessException{ //Doesn't require bad test becuase no parameters are passed.
+    void testListUsers() throws DataAccessException{ //Doesn't require bad test becuase no parameters are passed.
         assertEquals(0, db.listUsers().size());
         db.createUser(user1);
         assertEquals(1, db.listUsers().size());
@@ -95,7 +105,7 @@ public class MyDatabaseTests {
     }
 
     @Test
-    void createGame() throws DataAccessException{
+    void testCreateGame() throws DataAccessException{
         try {
             db.createGame("Game woooo");
         } catch (Exception e) {
@@ -103,16 +113,51 @@ public class MyDatabaseTests {
         }
     }
 
+    @Test //Test didn't pass, but maybe that's fine.
+    void testCreateNullGame() throws DataAccessException{
+        boolean excepted = false;
+        try {
+            db.createGame(null); //try to create null named game.
+        } catch (Exception e) {
+            excepted = true;
+        }
+        if(!excepted){
+            Assertions.fail("Expected DataAccessException on creating null game");
+        }
+    }
+
+
+
+
     @Test
-    void getGame() throws DataAccessException{
+    void testGetGame() throws DataAccessException{
         int gameID = db.createGame("woo GAme");
-        GameData game = db.getGame(gameID);
+        int secondGameID = db.createGame("2nd GAYme");
+        GameData game = db.getGame(secondGameID);
         assertNotNull(game);
-        assertEquals(gameID, game.gameID());
+        assertEquals(secondGameID, game.gameID());
         assertNull(game.whiteUsername());
         assertNull(game.blackUsername());
         assertEquals(new ChessGame(), game.game());
-        assertEquals("woo GAme", game.gameName());
+        assertEquals("2nd GAYme", game.gameName());
 
     }
+
+    @Test
+    void testGetWrongGame() throws  DataAccessException{
+        int gameID = db.createGame("woo GAme");
+        GameData game = db.getGame(0);
+        assertNull(game);
+    }
+
+    @Test
+    void testGetGames() throws DataAccessException{
+        db.createGame("woo GAme");
+        db.createGame("2nd GAYme");
+        System.out.println(db.listGames());
+        assertEquals(2, db.listGames().size());
+    }
+
+
+
 }

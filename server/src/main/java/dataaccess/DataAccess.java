@@ -19,7 +19,7 @@ public interface DataAccess {
 
     GameData getGame(int gameID)  throws DataAccessException;
 
-    Collection<GameData> listGames();
+    Collection<GameData> listGames() throws DataAccessException;
 
     void updateGame(GameData updatedGame);
 
