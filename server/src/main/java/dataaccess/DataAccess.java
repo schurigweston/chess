@@ -15,9 +15,9 @@ public interface DataAccess {
 
     Collection<UserData> listUsers() throws DataAccessException;
 
-    int createGame(String gameName);
+    int createGame(String gameName) throws DataAccessException;
 
-    GameData getGame(int gameID);
+    GameData getGame(int gameID)  throws DataAccessException;
 
     Collection<GameData> listGames();
 

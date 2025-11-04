@@ -1,5 +1,7 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -42,8 +44,8 @@ public class MySQLDataAccess implements DataAccess{
             """
             CREATE TABLE IF NOT EXISTS  games (
                 `id` int NOT NULL AUTO_INCREMENT,
-                `whiteUsername` varchar(256) NOT NULL,
-                `blackUsername` varchar(256) NOT NULL,
+                `whiteUsername` varchar(256) DEFAULT NULL,
+                `blackUsername` varchar(256) DEFAULT NULL,
                 `gameName` varchar(256) NOT NULL,
                 `game` TEXT NOT NULL,
                 PRIMARY KEY (`id`),
@@ -136,12 +138,37 @@ public class MySQLDataAccess implements DataAccess{
 
 
     @Override
-    public int createGame(String gameName) {
-        return 0;
+    public int createGame(String gameName) throws DataAccessException{
+
+        String chessGameJson = new Gson().toJson(new ChessGame());
+
+        String query = "INSERT INTO games (gameName, game) VALUES (?, ?)";
+        int gameID = executeUpdate(query, gameName, chessGameJson);
+
+        return gameID;
     }
 
     @Override
-    public GameData getGame(int gameID) {
+    public GameData getGame(int gameID) throws DataAccessException{
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String query = "SELECT gameID, whiteUsername, blackUsername, gameName, chessGame FROM games WHERE gameID = ?";
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+                ps.setInt(1, gameID);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new GameData(
+                                rs.getInt("gameID"),
+                                rs.getString("whiteUsername"),
+                                rs.getString("blackUsername"),
+                                rs.getString("gameName"),
+                                new Gson().fromJson(rs.getString("chessGame"), ChessGame.class)
+                        );
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data for gameID: %d", gameID), e);
+        }
         return null;
     }
 

@@ -90,4 +90,12 @@ public class MyDatabaseTests {
 
     }
 
+    @Test
+    void createGame() throws DataAccessException{
+        try {
+            db.createGame("Game woooo");
+        } catch (Exception e) {
+            Assertions.fail("createGame threw an exception: " + e.getMessage());
+        }
+    }
 }
