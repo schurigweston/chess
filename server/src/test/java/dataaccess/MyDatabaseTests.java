@@ -6,6 +6,7 @@ import dataaccess.DatabaseManager;
 import dataaccess.MySQLDataAccess;
 import model.UserData;
 import org.junit.jupiter.api.*;
+import org.mindrot.jbcrypt.BCrypt;
 import server.Server;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,13 +61,19 @@ public class MyDatabaseTests {
 
     }
 
-
+    @Test
     void testGetUser() throws DataAccessException{
+        db.createUser(user1);
 
+        assertEquals(user1.username(), db.getUser(user1.username()).username());
+        assertEquals(user1.email(), db.getUser(user1.username()).email());
     }
 
+    @Test
     void testGetNullUser() throws DataAccessException{
+        db.createUser(user1);
 
+        assertNull(db.getUser("Not a user"));
     }
 
 }
