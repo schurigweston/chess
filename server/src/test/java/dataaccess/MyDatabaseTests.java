@@ -33,5 +33,40 @@ public class MyDatabaseTests {
         assertNull(db.getUser(user1.username()));
     }
 
+    @Test
+    void testCreateUser() throws DataAccessException{
+        try {
+            db.createUser(user1);
+        } catch (Exception e) {
+            Assertions.fail("createUser threw an exception: " + e.getMessage());
+        }
+
+    }
+
+    @Test
+    void testCreateDuplicateUser() throws DataAccessException{
+        boolean excepted = false;
+        try {
+            db.createUser(user1);
+            db.createUser(user1);
+        } catch (Exception e) {
+            excepted = true;
+        }
+
+        if(!excepted){
+            Assertions.fail("Expected DataAccessException on creating Duplicate user");
+        }
+
+
+    }
+
+
+    void testGetUser() throws DataAccessException{
+
+    }
+
+    void testGetNullUser() throws DataAccessException{
+
+    }
 
 }
