@@ -1,9 +1,11 @@
 package dataaccess;
 
+import chess.ChessGame;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.MySQLDataAccess;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import org.mindrot.jbcrypt.BCrypt;
@@ -32,8 +34,10 @@ public class MyDatabaseTests {
     @Test
     void testClear() throws DataAccessException{ //relies on createUser and getUser. Make sure those also work.
         db.createUser(user1);
+        db.createGame("A Game");
         db.clear();
         assertNull(db.getUser(user1.username()));
+        assertNull(db.getGame(1));
     }
 
     @Test
@@ -97,5 +101,18 @@ public class MyDatabaseTests {
         } catch (Exception e) {
             Assertions.fail("createGame threw an exception: " + e.getMessage());
         }
+    }
+
+    @Test
+    void getGame() throws DataAccessException{
+        int gameID = db.createGame("woo GAme");
+        GameData game = db.getGame(gameID);
+        assertNotNull(game);
+        assertEquals(gameID, game.gameID());
+        assertNull(game.whiteUsername());
+        assertNull(game.blackUsername());
+        assertEquals(new ChessGame(), game.game());
+        assertEquals("woo GAme", game.gameName());
+
     }
 }

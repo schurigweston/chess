@@ -151,17 +151,17 @@ public class MySQLDataAccess implements DataAccess{
     @Override
     public GameData getGame(int gameID) throws DataAccessException{
         try (Connection conn = DatabaseManager.getConnection()) {
-            String query = "SELECT gameID, whiteUsername, blackUsername, gameName, chessGame FROM games WHERE gameID = ?";
+            String query = "SELECT id, whiteUsername, blackUsername, gameName, game FROM games WHERE id = ?";
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 ps.setInt(1, gameID);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return new GameData(
-                                rs.getInt("gameID"),
+                                rs.getInt("id"),
                                 rs.getString("whiteUsername"),
                                 rs.getString("blackUsername"),
                                 rs.getString("gameName"),
-                                new Gson().fromJson(rs.getString("chessGame"), ChessGame.class)
+                                new Gson().fromJson(rs.getString("game"), ChessGame.class)
                         );
                     }
                 }
