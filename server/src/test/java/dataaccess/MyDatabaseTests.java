@@ -15,7 +15,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MyDatabaseTests {
 
     private static DataAccess db;
-    private static UserData user1 = new UserData("john", "pass", "nrg");
+    private static UserData user1 = new UserData("john", "pass", "NRG");
+    private static UserData user2 = new UserData("Greak", "pass", "Fnatic");
+    private static UserData user3 = new UserData("Sarlot", "pass", "SEN");
 
     @BeforeAll
     public static void startServer() throws DataAccessException {
@@ -74,6 +76,18 @@ public class MyDatabaseTests {
         db.createUser(user1);
 
         assertNull(db.getUser("Not a user"));
+    }
+
+    @Test
+    void listUsers() throws DataAccessException{ //Doesn't require bad test becuase no parameters are passed.
+        assertEquals(0, db.listUsers().size());
+        db.createUser(user1);
+        assertEquals(1, db.listUsers().size());
+        db.createUser(user2);
+        assertEquals(2, db.listUsers().size());
+        db.createUser(user3);
+        assertEquals(3, db.listUsers().size());
+
     }
 
 }

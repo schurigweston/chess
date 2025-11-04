@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.sql.*;
 import org.mindrot.jbcrypt.BCrypt;
+import  java.util.ArrayList;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
@@ -109,9 +110,30 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     @Override
-    public Collection<UserData> listUsers() {
-        return List.of();
+    public Collection<UserData> listUsers() throws DataAccessException {
+        ArrayList<UserData> userList = new ArrayList<UserData>();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String query = "SELECT * FROM users";
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        userList.add(
+                        new UserData(
+                                rs.getString("username"),
+                                rs.getString("password"),
+                                rs.getString("email")
+                        ));
+                    }
+
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Unable to read data", e);
+        }
+        return userList;
     }
+
 
     @Override
     public int createGame(String gameName) {
