@@ -31,8 +31,8 @@ public class Server{
         userService = new UserService(db);
         gameService = new GameService(db);
         javalin = Javalin.create(config -> {
-            config.staticFiles.add("web");           // keep your static files
-            config.jsonMapper(new JavalinGson());    // add this for JSON support
+            config.staticFiles.add("web");
+            config.jsonMapper(new JavalinGson());
         });
         javalin.delete("/db", ctx -> clearDatabase(ctx));
         javalin.post("/user", ctx -> addUser(ctx));
