@@ -11,25 +11,25 @@ import java.util.Collection;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
-    static final UserService userService;
+    static final UserService USER_SERVICE;
 
     static {
-        userService = new UserService(new MemoryDataAccess());
+        USER_SERVICE = new UserService(new MemoryDataAccess());
     }
 
     @BeforeEach
     void clear() throws DataAccessException{
-        userService.clear();
+        USER_SERVICE.clear();
     }
 
     @Test
     void clearUsers() throws DataAccessException {
         UserData user = new UserData("johndoe", "pass", "j@d");
 
-        RegisterResult result = userService.register(new RegisterRequest(user.username(), user.password(), user.email()));
+        RegisterResult result = USER_SERVICE.register(new RegisterRequest(user.username(), user.password(), user.email()));
 
-        userService.clear();
-        Collection<UserData> users = userService.listUsers();
+        USER_SERVICE.clear();
+        Collection<UserData> users = USER_SERVICE.listUsers();
         assertTrue(users.isEmpty());
     }
 
@@ -37,9 +37,9 @@ public class UserServiceTest {
     void addUser() throws DataAccessException {
         UserData user = new UserData("johndoe", "pass", "j@d");
 
-        RegisterResult result = userService.register(new RegisterRequest(user.username(), user.password(), user.email()));
+        RegisterResult result = USER_SERVICE.register(new RegisterRequest(user.username(), user.password(), user.email()));
 
-        Collection<UserData> users = userService.listUsers();
+        Collection<UserData> users = USER_SERVICE.listUsers();
         UserData storedUser = users.iterator().next();
         assertEquals(user.username(), storedUser.username());
         assertEquals(user.email(), storedUser.email());
@@ -51,8 +51,8 @@ public class UserServiceTest {
         UserData john = new UserData("johndoe", "pass", "j@d");
 
 
-        userService.register(new RegisterRequest(john.username(), john.password(), john.email()));
-        assertThrows(DataAccessException.class, () -> userService.register(new RegisterRequest(john.username(), john.password(), john.email())));
+        USER_SERVICE.register(new RegisterRequest(john.username(), john.password(), john.email()));
+        assertThrows(DataAccessException.class, () -> USER_SERVICE.register(new RegisterRequest(john.username(), john.password(), john.email())));
 
     }
 
@@ -60,11 +60,11 @@ public class UserServiceTest {
     void loginUser() throws DataAccessException{
         UserData user = new UserData("johndoe", "pass", "j@d");
 
-        userService.register(new RegisterRequest(user.username(), user.password(), user.email()));
+        USER_SERVICE.register(new RegisterRequest(user.username(), user.password(), user.email()));
 
         LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
 
-        LoginResult result = userService.login(loginRequest);
+        LoginResult result = USER_SERVICE.login(loginRequest);
 
         assertNotNull(result);
         assertEquals(user.username(), result.username());
@@ -77,7 +77,7 @@ public class UserServiceTest {
 
 
         DataAccessException thrown = assertThrows(DataAccessException.class, () -> {
-            userService.login(badUser);
+            USER_SERVICE.login(badUser);
         });
 
         assertTrue(thrown.getMessage().contains("Username or Password does not exist"));

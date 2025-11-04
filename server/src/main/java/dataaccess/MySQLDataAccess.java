@@ -85,7 +85,7 @@ public class MySQLDataAccess implements DataAccess{
         //conn.prepareStatement("INSERT INTO users values (1, " + user.username() + "," + user.password() + "," + user.email() + ")"); //Bad, unsafe
         String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         String query = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
-        executeUpdate(query, user.username(), hashedPassword, user.email()); //This line returns an integer, the ID of the new user, if I ever need to use it.
+        executeUpdate(query, user.username(), hashedPassword, user.email()); //This line returns an integer, the ID of the new user.
 
     }
 
@@ -224,7 +224,7 @@ public class MySQLDataAccess implements DataAccess{
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        if (authToken == null) return null;
+        if (authToken == null) {return null;}
 
         try (Connection conn = DatabaseManager.getConnection()) {
             String query = "SELECT authToken, username FROM auths WHERE authToken = ?";
@@ -248,7 +248,7 @@ public class MySQLDataAccess implements DataAccess{
 
     @Override
     public void deleteAuth(AuthData authData) throws DataAccessException {
-        if (authData == null || authData.authToken() == null) return;
+        if (authData == null || authData.authToken() == null) {return;}
 
         String query = "DELETE FROM auths WHERE authToken = ?";
         executeUpdate(query, authData.authToken());
@@ -262,8 +262,8 @@ public class MySQLDataAccess implements DataAccess{
                     if(param == null){
                         ps.setNull(i + 1, Types.VARCHAR);
                     }
-                    else if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
+                    else if (param instanceof String p) {ps.setString(i + 1, p);}
+                    else if (param instanceof Integer p) {ps.setInt(i + 1, p);}
 
                 }
                 ps.executeUpdate();

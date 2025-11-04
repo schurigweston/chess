@@ -16,9 +16,9 @@ import java.util.Map;
 public class Server{
 
     private final Javalin javalin;
-    private final DataAccess db;// = new MySQLDataAccess();
-    private final UserService userService;// = new UserService(db);
-    private final GameService gameService;// = new GameService(db);
+    private final DataAccess db;
+    private final UserService userService;
+    private final GameService gameService;
 
     public Server() {
         DataAccess tempDB; //create Database with mySQL if it works, otherwise use memoryDataAccess

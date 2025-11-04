@@ -12,22 +12,22 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class GameServiceTest {
 
-    static final DataAccess db = new MemoryDataAccess();
-    static final GameService gameService = new GameService(db);
+    static final DataAccess DB = new MemoryDataAccess();
+    static final GameService GAME_SERVICE = new GameService(DB);
     @BeforeEach
     void clear() {
-        gameService.clear();
+        GAME_SERVICE.clear();
     }
 
     @Test
     void listGamesHappy() throws DataAccessException {
 
         UserData user = new UserData("johndoe", "pass", "j@d");
-        db.createUser(user);
+        DB.createUser(user);
         AuthData auth = new AuthData("token", user.username());
-        db.createAuth(auth);
+        DB.createAuth(auth);
 
-        Collection<GameData> games = gameService.listGames(auth.authToken());
+        Collection<GameData> games = GAME_SERVICE.listGames(auth.authToken());
 
         assertNotNull(games);
         assertTrue(games.isEmpty());
@@ -36,7 +36,7 @@ public class GameServiceTest {
     void listGamesSad() {
 
         try {
-            gameService.listGames("badtoken");
+            GAME_SERVICE.listGames("badtoken");
             fail("Expected a DataAccessException to be thrown");
         } catch (DataAccessException e) {
             assertTrue(e.getMessage().contains("unauthorized"));
@@ -46,11 +46,11 @@ public class GameServiceTest {
     void listGameSummariesHappy() throws DataAccessException {
 
         UserData user = new UserData("johndoe", "pass", "j@d");
-        db.createUser(user);
+        DB.createUser(user);
         AuthData auth = new AuthData("token", user.username());
-        db.createAuth(auth);
+        DB.createAuth(auth);
 
-        ListResult games = gameService.listGameSummaries(new ListRequest(auth.authToken()));
+        ListResult games = GAME_SERVICE.listGameSummaries(new ListRequest(auth.authToken()));
 
         assertNotNull(games);
         assertTrue(games.games().isEmpty());
@@ -60,7 +60,7 @@ public class GameServiceTest {
         ListRequest request = new ListRequest("invalid-token");
 
         try {
-            gameService.listGameSummaries(request);
+            GAME_SERVICE.listGameSummaries(request);
             fail("Expected a DataAccessException to be thrown");
         } catch (DataAccessException e) {
             assertEquals("Error: unauthorized", e.getMessage());
@@ -70,23 +70,23 @@ public class GameServiceTest {
     @Test
     void createGameHappy() throws DataAccessException {
         UserData user = new UserData("johndoe", "pass", "j@d");
-        db.createUser(user);
+        DB.createUser(user);
         AuthData auth = new AuthData("token", user.username());
-        db.createAuth(auth);
+        DB.createAuth(auth);
 
         CreateRequest request = new CreateRequest(auth.authToken(), "TestGame");
-        CreateResult result = gameService.createGame(request);
+        CreateResult result = GAME_SERVICE.createGame(request);
 
         assertNotNull(result);
         assertTrue(result.gameID() > 0);
-        assertEquals("TestGame", db.getGame(result.gameID()).gameName());
+        assertEquals("TestGame", DB.getGame(result.gameID()).gameName());
     }
 
     @Test
     void createGameSadUnauthorized() {
         CreateRequest request = new CreateRequest("badtoken", "TestGame");
         try {
-            gameService.createGame(request);
+            GAME_SERVICE.createGame(request);
             fail("Expected a DataAccessException to be thrown");
         } catch (DataAccessException e) {
             assertEquals("Error: unauthorized", e.getMessage());
@@ -96,13 +96,13 @@ public class GameServiceTest {
     @Test
     void createGameSadBadRequest() throws DataAccessException {
         UserData user = new UserData("johndoe", "pass", "j@d");
-        db.createUser(user);
+        DB.createUser(user);
         AuthData auth = new AuthData("token", user.username());
-        db.createAuth(auth);
+        DB.createAuth(auth);
 
         CreateRequest request = new CreateRequest(auth.authToken(), null);
         try {
-            gameService.createGame(request);
+            GAME_SERVICE.createGame(request);
             fail("Expected a DataAccessException to be thrown");
         } catch (DataAccessException e) {
             assertEquals("Error: bad request", e.getMessage());
@@ -112,16 +112,16 @@ public class GameServiceTest {
     @Test
     void joinGameHappy() throws DataAccessException {
         UserData user = new UserData("johndoe", "pass", "j@d");
-        db.createUser(user);
+        DB.createUser(user);
         AuthData auth = new AuthData("token", user.username());
-        db.createAuth(auth);
+        DB.createAuth(auth);
 
-        int gameID = db.createGame("TestGame");
+        int gameID = DB.createGame("TestGame");
 
         JoinRequest request = new JoinRequest(auth.authToken(), "WHITE", gameID);
-        gameService.joinGame(request);
+        GAME_SERVICE.joinGame(request);
 
-        GameData game = db.getGame(gameID);
+        GameData game = DB.getGame(gameID);
         assertEquals(user.username(), game.whiteUsername());
         assertNull(game.blackUsername());
     }
@@ -130,7 +130,7 @@ public class GameServiceTest {
     void joinGameSadUnauthorized() {
         JoinRequest request = new JoinRequest("badtoken", "WHITE", 1);
         try {
-            gameService.joinGame(request);
+            GAME_SERVICE.joinGame(request);
             fail("Expected a DataAccessException to be thrown");
         } catch (DataAccessException e) {
             assertEquals("Error: unauthorized", e.getMessage());
@@ -140,13 +140,13 @@ public class GameServiceTest {
     @Test
     void joinGameSadBadRequest() throws DataAccessException {
         UserData user = new UserData("johndoe", "pass", "j@d");
-        db.createUser(user);
+        DB.createUser(user);
         AuthData auth = new AuthData("token", user.username());
-        db.createAuth(auth);
+        DB.createAuth(auth);
 
         JoinRequest request = new JoinRequest(auth.authToken(), "RED", 999);
         try {
-            gameService.joinGame(request);
+            GAME_SERVICE.joinGame(request);
             fail("Expected a DataAccessException to be thrown");
         } catch (DataAccessException e) {
             assertEquals("Error: bad request", e.getMessage());
@@ -156,22 +156,22 @@ public class GameServiceTest {
     @Test
     void joinGameSadAlreadyTaken() throws DataAccessException {
         UserData user1 = new UserData("user1", "pass", "u1@d");
-        db.createUser(user1);
+        DB.createUser(user1);
         AuthData auth1 = new AuthData("token1", user1.username());
-        db.createAuth(auth1);
+        DB.createAuth(auth1);
 
         UserData user2 = new UserData("user2", "pass", "u2@d");
-        db.createUser(user2);
+        DB.createUser(user2);
         AuthData auth2 = new AuthData("token2", user2.username());
-        db.createAuth(auth2);
+        DB.createAuth(auth2);
 
-        int gameID = db.createGame("TestGame");
+        int gameID = DB.createGame("TestGame");
         JoinRequest request1 = new JoinRequest(auth1.authToken(), "WHITE", gameID);
-        gameService.joinGame(request1);
+        GAME_SERVICE.joinGame(request1);
 
         JoinRequest request2 = new JoinRequest(auth2.authToken(), "WHITE", gameID);
         try {
-            gameService.joinGame(request2);
+            GAME_SERVICE.joinGame(request2);
             fail("Expected a DataAccessException to be thrown");
         } catch (DataAccessException e) {
             assertEquals("Error: already taken", e.getMessage());

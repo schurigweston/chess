@@ -136,55 +136,26 @@ public class ChessGame {
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
      */
-    public boolean isInCheckmate(TeamColor teamColor) {
-        //if teamcolor king is in check and mo valid moves, return true
-        ChessPosition position;
-        Boolean hasValidMoves = false;
+    private boolean hasAnyValidMoves(TeamColor teamColor) {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
-                position = new ChessPosition(row, col);
-                if (board.getPiece(position) != null && board.getPiece(position).getTeamColor().equals(teamColor)) {//If that piece color is the SAME team...
-                    //get the moves for that piece...
-                    if(!validMoves(position).isEmpty()) {
-                        hasValidMoves = true;
-                    }
-
+                ChessPosition position = new ChessPosition(row, col);
+                if (board.getPiece(position) != null &&
+                        board.getPiece(position).getTeamColor().equals(teamColor) &&
+                        !validMoves(position).isEmpty()) {
+                    return true; // Found at least one valid move
                 }
             }
         }
-        if(!hasValidMoves && isInCheck(teamColor)){
-            return true;
-        }
-        return false;
+        return false; // No valid moves found
     }
 
-    /**
-     * Determines if the given team is in stalemate, which here is defined as having
-     * no valid moves while not in check.
-     *
-     * @param teamColor which team to check for stalemate
-     * @return True if the specified team is in stalemate, otherwise false
-     */
-    public boolean isInStalemate(TeamColor teamColor) {
-        //if no valid moves and not in check, return true
-        ChessPosition position;
-        Boolean hasValidMoves = false;
-        for (int row = 1; row <= 8; row++) {
-            for (int col = 1; col <= 8; col++) {
-                position = new ChessPosition(row, col);
-                if (board.getPiece(position) != null && board.getPiece(position).getTeamColor().equals(teamColor)) {//If that piece color is the SAME team...
-                    //get the moves for that piece...
-                    if(!validMoves(position).isEmpty()) {
-                        hasValidMoves = true;
-                    }
+    public boolean isInCheckmate(TeamColor teamColor) {
+        return !hasAnyValidMoves(teamColor) && isInCheck(teamColor);
+    }
 
-                }
-            }
-        }
-        if(!hasValidMoves && !isInCheck(teamColor)){
-            return true;
-        }
-        return false;
+    public boolean isInStalemate(TeamColor teamColor) {
+        return !hasAnyValidMoves(teamColor) && !isInCheck(teamColor);
     }
 
     /**
