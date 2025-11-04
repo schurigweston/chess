@@ -52,7 +52,8 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        if(board.getPiece(startPosition) == null){ //If that startPosition is empty, return empty valid moves. If that startPosition is en enemy piece, return empty.
+        if(board.getPiece(startPosition) == null){ //If that startPosition is empty, return empty valid moves.
+                                                    // If that startPosition is en enemy piece, return empty.
             return new ArrayList<ChessMove>();
         }
         TeamColor pieceColor = board.getPiece(startPosition).getTeamColor();
@@ -79,8 +80,12 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if(!validMoves(move.getStartPosition()).contains(move) || !board.getPiece(move.getStartPosition()).getTeamColor().equals(teamColor)){// if the move isn't a valid move, or the piece is the wrong color...
-            throw new InvalidMoveException("Waaaah boo hoo invalid move I'll come and make this a good exception later. ");
+        if(!validMoves(move.getStartPosition()).contains(move)
+                || !board.getPiece(move.getStartPosition()).getTeamColor().equals(teamColor)){
+            // if the move isn't a valid move, or the piece is the wrong color...
+
+            throw new InvalidMoveException("Waaaah boo hoo invalid move I'll come and make " +
+                    "this a good exception later(9/20/25). Well, it's later, and I'm not fixing it(11/3/25.");
         }
         var pieceColor = board.getPiece(move.getStartPosition()).getTeamColor();
         var start = move.getStartPosition();

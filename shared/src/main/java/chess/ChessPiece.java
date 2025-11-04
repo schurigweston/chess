@@ -84,7 +84,10 @@ public class ChessPiece {
     }
     private boolean isInBounds(ChessPosition potentialPosition){
         //Both row and column are between 1 and 8
-        return potentialPosition.getRow() >= 1 && potentialPosition.getRow() <= 8 && potentialPosition.getColumn() >= 1 && potentialPosition.getColumn() <= 8;
+        return potentialPosition.getRow() >= 1
+                && potentialPosition.getRow() <= 8
+                && potentialPosition.getColumn() >= 1
+                && potentialPosition.getColumn() <= 8;
     }
     private boolean isValidMovePosition(ChessBoard board, ChessPosition potentialPosition, ChessGame.TeamColor color){
 
@@ -107,7 +110,8 @@ public class ChessPiece {
             do{
                 potentialPosition = new ChessPosition(myPosition.getRow() + rowDir * distance, myPosition.getColumn() + colDir * distance);
 
-                if(isValidMovePosition(board, potentialPosition, board.getPiece(myPosition).getTeamColor())){//If it's a valid position, add piece, but stop if the position is on a piece.
+                if(isValidMovePosition(board, potentialPosition, board.getPiece(myPosition).getTeamColor())){
+                    //If it's a valid position, add piece, but stop if the position is on a piece.
                     moves.add(new ChessMove(myPosition, potentialPosition, null));
 
                     if(board.getPiece(potentialPosition) != null) {
@@ -162,7 +166,9 @@ public class ChessPiece {
 
         for (int i = -1; i <=1 ; i+=2) {//for the pawn's left and right side
             potentialPosition = new ChessPosition(myPosition.getRow()+direction,myPosition.getColumn()+i);
-            if(isInBounds(potentialPosition)&& board.getPiece(potentialPosition)!=null&& board.getPiece(potentialPosition).getTeamColor()!=board.getPiece(myPosition).getTeamColor()){//If the side corners are in bounds and the piece isn't null and the piece is not the same color...
+            if(isInBounds(potentialPosition)&& board.getPiece(potentialPosition)!=null
+                    && board.getPiece(potentialPosition).getTeamColor()!=board.getPiece(myPosition).getTeamColor()){
+                //If the side corners are in bounds and the piece isn't null and the piece is not the same color...
                 moves.add(new ChessMove(myPosition,potentialPosition, null));
             }
         }

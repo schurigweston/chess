@@ -22,7 +22,8 @@ public class UserService {
             throw new DataAccessException("Error: already taken");
         }
 
-        //String hashedPassword = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt()); //This would be good to do here, but I've already done it in my databases, which was bad, but is what it is.
+        //String hashedPassword = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
+        // This would be good to do here, but I've already done it in my databases, which was bad, but is what it is.
 
         UserData user = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
 
