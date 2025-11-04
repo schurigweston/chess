@@ -2,6 +2,7 @@ package service;
 
 import model.*;
 import dataaccess.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -21,6 +22,8 @@ public class UserService {
             throw new DataAccessException("Error: already taken");
         }
 
+        //String hashedPassword = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt()); //This would be good to do here, but I've already done it in my databases, which was bad, but is what it is.
+
         UserData user = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
 
         db.createUser(user);
@@ -38,7 +41,8 @@ public class UserService {
         if(loginRequest.username() == null || loginRequest.password() == null) { //if there is no username or password provided...
             throw new DataAccessException("Error: bad request");
         }
-        if(db.getUser(loginRequest.username()) == null || !db.getUser(loginRequest.username()).password().equals(loginRequest.password())){ //If the username doesn't exist or the password doesn't match for that username...
+        UserData user = db.getUser(loginRequest.username());
+        if(user == null || !BCrypt.checkpw(loginRequest.password(), user.password())){
             throw new DataAccessException("Error: Username or Password does not exist");
         }
 
@@ -69,11 +73,8 @@ public class UserService {
         return db.listUsers();
     }
 
-    public void clear() {
-        try {
-            db.clear();
-        } catch (DataAccessException e) {
-            System.err.println("Failed to clear database: " + e.getMessage());
-        }
+    public void clear() throws DataAccessException {
+
+        db.clear();
     }
 }

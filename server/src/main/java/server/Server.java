@@ -25,6 +25,7 @@ public class Server{
         try{
             tempDB = new MySQLDataAccess();
         } catch (DataAccessException e){
+            System.out.println("USING MEMORYDATAACCESS");
             tempDB = new MemoryDataAccess();
         }
         this.db = tempDB;
@@ -48,9 +49,13 @@ public class Server{
     }
 
     private void clearDatabase(@NotNull Context ctx) {
-        userService.clear();
-        gameService.clear();
-
+        try {
+            userService.clear();
+            gameService.clear();
+            ctx.status(200).json(Map.of("message", "Database cleared"));
+        } catch (DataAccessException e) {
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+        }
     }
 
     private void addUser(@NotNull Context ctx) {
@@ -65,7 +70,8 @@ public class Server{
             } else if (msg.contains("bad request")) {
                 ctx.status(400).json(Map.of("message", "Error: bad request"));
             } else {
-                ctx.status(500).json(Map.of("message", msg));
+                ctx.status(500).json(Map.of("message", "Error: " + msg));
+
             }
         }
     }
@@ -82,7 +88,7 @@ public class Server{
             } else if (msg.contains("bad request")) {
                 ctx.status(400).json(Map.of("message", "Error: bad request"));
             } else {
-                ctx.status(500).json(Map.of("message", msg));
+                ctx.status(500).json(Map.of("message", "Error: " + msg));
             }
         }
     }
@@ -98,9 +104,9 @@ public class Server{
             if (msg.contains("unauthorized")) {
                 ctx.status(401).json(Map.of("message", "Error: unauthorized"));
             } else if (msg.contains("bad request")) {
-                ctx.status(400).json(Map.of("message", msg));
+                ctx.status(400).json(Map.of("message", "Error: " + msg));
             } else {
-                ctx.status(500).json(Map.of("message", msg));
+                ctx.status(500).json(Map.of("message", "Error: " + msg));
 
             }
         }
@@ -116,7 +122,7 @@ public class Server{
             if (e.getMessage().contains("unauthorized")) {
                 ctx.status(401).json(Map.of("message", "Error: unauthorized"));
             } else {
-                ctx.status(500).json(Map.of("message", e.getMessage()));
+                ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
             }
         }
     }
@@ -137,7 +143,7 @@ public class Server{
             else if (msg.contains("unauthorized")) {
                 ctx.status(401).json(Map.of("message", "Error: unauthorized"));
             } else {
-                ctx.status(500).json(Map.of("message", msg));
+                ctx.status(500).json(Map.of("message", "Error: " + msg));
             }
         }
     }
@@ -161,7 +167,7 @@ public class Server{
                 ctx.status(403).json(Map.of("message", "Error: already taken"));
             }
             else {
-                ctx.status(500).json(Map.of("message", msg));
+                ctx.status(500).json(Map.of("message", "Error: " + msg));
             }
         }
     }

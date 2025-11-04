@@ -11,10 +11,14 @@ import java.util.Collection;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
-    static final UserService userService = new UserService(new MemoryDataAccess());
+    static final UserService userService;
+
+    static {
+        userService = new UserService(new MemoryDataAccess());
+    }
 
     @BeforeEach
-    void clear() {
+    void clear() throws DataAccessException{
         userService.clear();
     }
 
@@ -36,8 +40,10 @@ public class UserServiceTest {
         RegisterResult result = userService.register(new RegisterRequest(user.username(), user.password(), user.email()));
 
         Collection<UserData> users = userService.listUsers();
-        assertEquals(1, users.size());
-        assertTrue(users.contains(user));
+        UserData storedUser = users.iterator().next();
+        assertEquals(user.username(), storedUser.username());
+        assertEquals(user.email(), storedUser.email());
+        assertNotEquals(user.password(), storedUser.password());
     }
 
     @Test

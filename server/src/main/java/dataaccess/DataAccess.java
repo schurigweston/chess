@@ -21,11 +21,11 @@ public interface DataAccess {
 
     Collection<GameData> listGames() throws DataAccessException;
 
-    void updateGame(GameData updatedGame);
+    void updateGame(GameData updatedGame) throws DataAccessException;
 
-    void createAuth(AuthData authData);
+    void createAuth(AuthData authData) throws DataAccessException;
 
-    AuthData getAuth(String authToken);
+    AuthData getAuth(String authToken) throws DataAccessException;
 
-    void deleteAuth(AuthData authData);
+    void deleteAuth(AuthData authData) throws DataAccessException;
 }

@@ -199,23 +199,59 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     @Override
-    public void updateGame(GameData updatedGame) {
+    public void updateGame(GameData updatedGame) throws DataAccessException {
+        String query = "UPDATE games SET whiteUsername = ?, blackUsername = ?, game = ? WHERE id = ?";
+        String gameJson = new Gson().toJson(updatedGame.game());
 
+        executeUpdate(query,
+                updatedGame.whiteUsername(),
+                updatedGame.blackUsername(),
+                gameJson,
+                updatedGame.gameID()
+        );
     }
 
     @Override
-    public void createAuth(AuthData authData) {
+    public void createAuth(AuthData authData) throws DataAccessException {
+        //auths.put(authData.authToken(), authData);
+        if (authData == null || authData.authToken() == null || authData.username() == null) {
+            throw new DataAccessException("AuthData or its fields cannot be null");
+        }
 
+        String query = "INSERT INTO auths (authToken, username) VALUES (?, ?)";
+        executeUpdate(query, authData.authToken(), authData.username());
     }
 
     @Override
-    public AuthData getAuth(String authToken) {
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        if (authToken == null) return null;
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String query = "SELECT authToken, username FROM auths WHERE authToken = ?";
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+                ps.setString(1, authToken);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new AuthData(
+                                rs.getString("authToken"),
+                                rs.getString("username")
+                        );
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("Unable to read auth for token: %s", authToken), e);
+        }
+
         return null;
     }
 
     @Override
-    public void deleteAuth(AuthData authData) {
+    public void deleteAuth(AuthData authData) throws DataAccessException {
+        if (authData == null || authData.authToken() == null) return;
 
+        String query = "DELETE FROM auths WHERE authToken = ?";
+        executeUpdate(query, authData.authToken());
     }
 
     private int executeUpdate(String statement, Object... params) throws DataAccessException { //Lol yoinked from pet shop.
@@ -223,7 +259,10 @@ public class MySQLDataAccess implements DataAccess{
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
+                    if(param == null){
+                        ps.setNull(i + 1, Types.VARCHAR);
+                    }
+                    else if (param instanceof String p) ps.setString(i + 1, p);
                     else if (param instanceof Integer p) ps.setInt(i + 1, p);
 
                 }

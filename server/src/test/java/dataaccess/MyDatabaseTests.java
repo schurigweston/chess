@@ -1,10 +1,11 @@
 package dataaccess;
 
-import chess.ChessGame;
+import chess.*;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.MySQLDataAccess;
+import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
@@ -154,10 +155,83 @@ public class MyDatabaseTests {
     void testGetGames() throws DataAccessException{
         db.createGame("woo GAme");
         db.createGame("2nd GAYme");
-        System.out.println(db.listGames());
         assertEquals(2, db.listGames().size());
     }
 
+    @Test
+    void testUpdateGame() throws InvalidMoveException, DataAccessException {
+        ChessGame game = new ChessGame();
+        game.makeMove(new ChessMove(new ChessPosition(2,2), new ChessPosition(3,2), null));
+        int gameID = db.createGame("zeGame");
+        GameData updatedGame = new GameData(gameID, null, null, null, game);
+        db.updateGame(updatedGame);
+        GameData retrievedGame = db.getGame(gameID);
 
+        assertNotNull(retrievedGame);
+        assertEquals(gameID, retrievedGame.gameID());
+        assertEquals(game, retrievedGame.game()); // Requires ChessGame.equals implemented
+        assertNull(retrievedGame.whiteUsername());
+        assertNull(retrievedGame.blackUsername());
+        assertEquals("zeGame", retrievedGame.gameName());
+    }
 
+    @Test
+    void testCreateAuth() throws DataAccessException {
+        db.createUser(user1);
+        AuthData auth = new AuthData("token123", "john");
+        Assertions.assertDoesNotThrow(() -> db.createAuth(auth));
+
+        AuthData fetched = db.getAuth("token123");
+        assertNotNull(fetched);
+        assertEquals("john", fetched.username());
+        assertEquals("token123", fetched.authToken());
+    }
+
+    @Test
+    void testCreateDuplicateAuth() throws DataAccessException {
+        db.createUser(user1);
+        AuthData auth = new AuthData("tokenDuplicate", "john");
+        Assertions.assertDoesNotThrow(() -> db.createAuth(auth));
+
+        Exception exception = Assertions.assertThrows(DataAccessException.class, () -> {
+            db.createAuth(auth); // same token again
+        });
+
+        String message = exception.getMessage();
+        assertTrue(message.contains("Duplicate") || message.contains("unable to update"));
+    }
+
+    @Test
+    void testGetAuth() throws DataAccessException {
+        db.createUser(user1);
+        AuthData auth = new AuthData("tokenGet", "john");
+        db.createAuth(auth);
+
+        AuthData fetched = db.getAuth("tokenGet");
+        assertNotNull(fetched);
+        assertEquals("john", fetched.username());
+    }
+
+    @Test
+    void testGetAuthNonExistent() throws DataAccessException {
+        AuthData fetched = db.getAuth("nonexistentToken");
+        assertNull(fetched);
+    }
+
+    @Test
+    void testDeleteAuth() throws DataAccessException {
+        db.createUser(user1);
+        AuthData auth = new AuthData("tokenDelete", "john");
+        db.createAuth(auth);
+
+        db.deleteAuth(auth);
+        assertNull(db.getAuth("tokenDelete"));
+    }
+
+    @Test
+    void testDeleteAuthNonExistent() throws DataAccessException {
+        db.createUser(user1);
+        AuthData auth = new AuthData("nonexistentToken", "john");
+        Assertions.assertDoesNotThrow(() -> db.deleteAuth(auth));
+    }
 }
