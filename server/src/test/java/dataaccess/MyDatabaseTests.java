@@ -185,6 +185,7 @@ public class MyDatabaseTests {
         assertNotNull(fetched);
         assertEquals("john", fetched.username());
         assertEquals("token123", fetched.authToken());
+        assertTrue(true); //Push Too
     }
 
     @Test
