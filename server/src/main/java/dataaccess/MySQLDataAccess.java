@@ -7,10 +7,11 @@ import model.GameData;
 import model.UserData;
 
 import java.util.Collection;
-import java.util.List;
 import java.sql.*;
 import org.mindrot.jbcrypt.BCrypt;
 import  java.util.ArrayList;
+
+import model.*;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 

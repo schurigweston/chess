@@ -1,16 +1,10 @@
 package dataaccess;
 
 import chess.*;
-import dataaccess.DataAccess;
-import dataaccess.DataAccessException;
-import dataaccess.DatabaseManager;
-import dataaccess.MySQLDataAccess;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
-import org.mindrot.jbcrypt.BCrypt;
-import server.Server;
 
 import static org.junit.jupiter.api.Assertions.*;
 

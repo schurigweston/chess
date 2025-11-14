@@ -5,9 +5,9 @@ import dataaccess.*;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import io.javalin.json.JavalinGson;
-import model.*;
 import io.javalin.*;
 import io.javalin.http.Context;
+import model.*;
 import org.jetbrains.annotations.NotNull;
 import service.*;
 

@@ -1,11 +1,12 @@
 package service;
 
-import model.*;
 import dataaccess.*;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Collection;
 import java.util.UUID;
+
+import model.*;
 
 public class UserService {
     private final DataAccess db;

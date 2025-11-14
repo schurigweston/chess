@@ -1,10 +1,10 @@
 package service;
 
-import model.*;
 import dataaccess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import model.*;
 
 public class GameService {
     private final DataAccess db;

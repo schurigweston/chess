@@ -1,13 +1,13 @@
 package dataaccess;
 
 import chess.ChessGame;
-import model.*;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import model.*;
 
 public class MemoryDataAccess implements DataAccess {
     Map<String, UserData> users = new HashMap<>();
