@@ -9,9 +9,7 @@ import client.ResponseException;
 import client.ServerFacade;
 import model.*;
 
-
-
-import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
+import static ui.EscapeSequences.*;
 
 
 public class TerminalClient {
@@ -98,6 +96,7 @@ public class TerminalClient {
         if(params.length == 2){
             int gameID;
             JoinRequest joinRequest;
+            boolean white = true;
             if(gameSummaryMap.isEmpty()){
                 list();
             }
@@ -109,20 +108,38 @@ public class TerminalClient {
 
             if(params[1].equalsIgnoreCase("BLACK")){
                 joinRequest = new JoinRequest(authToken, "BLACK", gameSummaryMap.get(gameID).gameID());
+                white = false;
             }else if(params[1].equalsIgnoreCase("WHITE")){
                 joinRequest = new JoinRequest(authToken, "WHITE", gameSummaryMap.get(gameID).gameID());
+                white = true;
             }else{
                 throw new ResponseException(ResponseException.Code.ClientError, "Invalid Color");
             }
             JoinResult result = serverFacade.join(joinRequest); //returns a register result, which has username and authtoken
 
+            drawBoard(white);
             return "Joined " + gameSummaryMap.get(gameID).gameName() + " as " + params[1];
         }
         throw new ResponseException(ResponseException.Code.ClientError, "expected 2 arguments and got " + params.length);
     }
 
-    private String observe(String[] params) {
-        return "maybe looked at a game";
+    private String observe(String[] params) throws ResponseException {
+        if(params.length == 1){
+            int gameID;
+
+            if(gameSummaryMap.isEmpty()){
+                list();
+            }
+            try{
+                gameID = Integer.parseInt(params[0]);
+            } catch (Exception e) {
+                throw new ResponseException(ResponseException.Code.ClientError, "Invalid gameID");
+            }
+
+            drawBoard(true);
+            return "Observing " + gameSummaryMap.get(gameID).gameName();
+        }
+        throw new ResponseException(ResponseException.Code.ClientError, "expected 1 arguments and got " + params.length);
     }
 
     private String list() throws ResponseException {
@@ -208,5 +225,52 @@ public class TerminalClient {
         }
         System.out.println(help());
 
+    }
+
+    public void drawBoard(boolean whitePerspective) {
+        String[][] board = {
+                {BLACK_ROOK,  BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK},
+                {BLACK_PAWN,  BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN,  BLACK_PAWN, BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN},
+                {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
+                {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
+                {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
+                {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
+                {WHITE_PAWN,  WHITE_PAWN,   WHITE_PAWN,   WHITE_PAWN,  WHITE_PAWN, WHITE_PAWN,   WHITE_PAWN,   WHITE_PAWN},
+                {WHITE_ROOK,  WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK}
+        };
+
+        if (!whitePerspective) {
+            for (int i = 7; i >= 0; i--) {
+                System.out.print((8 - i) + " ");
+                for (int j = 7; j >= 0; j--) {
+                    if ((i + j) % 2 == 0) {
+                        System.out.print(SET_BG_COLOR_LIGHT_GREY + board[i][j] + RESET_BG_COLOR);
+                    } else {
+                        System.out.print(SET_BG_COLOR_DARK_GREY + board[i][j] + RESET_BG_COLOR);
+                    }
+                }
+                System.out.println();
+            }
+            System.out.printf(
+                    "%sh%sg%sf%se%sd%sc%sb%sa%n",
+                    SMALLER_EMPTY, SMALLER_EMPTY, SMALLER_EMPTY, SMALLER_EMPTY, SMALLER_EMPTY, SMALLER_EMPTY, SMALLER_EMPTY, SMALLER_EMPTY
+            );
+        } else {
+            for (int i = 0; i < board.length; i++) {
+                System.out.print((8-i) + " ");
+                for (int j = 0; j < board[i].length; j++) {
+                    if ((i + j) % 2 == 0) {
+                        System.out.print(SET_BG_COLOR_LIGHT_GREY + board[i][j] + RESET_BG_COLOR);
+                    } else {
+                        System.out.print(SET_BG_COLOR_DARK_GREY + board[i][j] + RESET_BG_COLOR);
+                    }
+                }
+                System.out.println();
+            }
+            System.out.printf(
+                    "%sa%sb%sc%sd%se%sf%sg%sh%n",
+                    SMALLER_EMPTY, SMALLER_EMPTY, SMALLER_EMPTY, SMALLER_EMPTY, SMALLER_EMPTY, SMALLER_EMPTY, SMALLER_EMPTY, SMALLER_EMPTY
+            );
+        }
     }
 }
