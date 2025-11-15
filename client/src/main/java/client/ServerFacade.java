@@ -104,6 +104,11 @@ public class ServerFacade {
         return status / 100 == 2;
     }
 
+    public void clear() throws ResponseException {
 
+        var request = buildRequest("DELETE", "/db", "","");
+        var response = sendRequest(request);
+
+    }
 
 }

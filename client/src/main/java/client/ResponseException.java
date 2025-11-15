@@ -7,6 +7,8 @@ import java.util.Map;
 
 public class ResponseException extends Exception {
 
+
+
     public enum Code {
         ServerError,
         ClientError,

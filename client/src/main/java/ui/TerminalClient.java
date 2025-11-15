@@ -102,6 +102,7 @@ public class TerminalClient {
             }
             try{
                 gameID = Integer.parseInt(params[0]);
+                gameSummaryMap.get(gameID).gameID();
             } catch (Exception e) {
                 throw new ResponseException(ResponseException.Code.ClientError, "Invalid gameID");
             }
@@ -180,7 +181,7 @@ public class TerminalClient {
 
     private String register(String[] params) throws ResponseException {
         //Parameters should be Username, password, and email.
-        if(params.length == 3){
+        if(params.length == 3 && !params[1].isEmpty()){
 
             RegisterResult result = serverFacade.register(params); //returns a register result, which has username and authtoken
             authToken = result.authToken();
