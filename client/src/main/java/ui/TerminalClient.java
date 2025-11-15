@@ -33,7 +33,10 @@ public class TerminalClient {
 
             try {
                 result = eval(line);
-                System.out.println(SET_TEXT_COLOR_BLUE + result);
+                if(!result.isEmpty()){
+                    System.out.println(SET_TEXT_COLOR_BLUE + result);
+                }
+
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
@@ -94,7 +97,7 @@ public class TerminalClient {
     }
 
     private String innerHelp() {
-        return "create <NAME>e\n" +
+        return "create <NAME>\n" +
                 "list - games\n" +
                 "join<ID> [WHITE|BLACK|\n" +
                 "observe <ID>\n" +
@@ -131,7 +134,7 @@ public class TerminalClient {
             LoginResult result = serverFacade.login(params); //returns a register result, which has username and authtoken
             authToken = result.authToken();
             username = result.username();
-            System.out.println("Welcome, " + result.username());
+            //System.out.println("Welcome, " + result.username());
             loggedIn();
             return "";
         }
@@ -144,7 +147,7 @@ public class TerminalClient {
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        while (!result.equals("inner quit")) {
+        while (authToken != null) {//second part should be unnecessary.
             System.out.print(">>>");
             String line = scanner.nextLine();
 
@@ -156,6 +159,7 @@ public class TerminalClient {
                 System.out.print(msg);
             }
         }
-        System.out.println();
+        System.out.println(help());
+
     }
 }
