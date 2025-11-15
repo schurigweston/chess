@@ -2,25 +2,33 @@ package client;
 
 import com.google.gson.Gson;
 
-import client.ResponseException;
-
 import java.net.*;
 import java.net.http.*;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
-import server.model.*;
+import model.*;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
-    private final String serverUrl = "http://localhost:8080/";
+    private final String serverUrl = "http://localhost:8080";
 
 //What does a ServerFacade do? It sends requests to the server and receives responses from the server.
 
 
-    public void register(String[] params) throws ResponseException{
+    public RegisterResult register(String[] params) throws ResponseException{
+        RegisterRequest registerRequest = new RegisterRequest(params[0],params[1],params[2]);
+        var request = buildRequest("POST", "/user", registerRequest);
+        var response = sendRequest(request);
+        return handleResponse(response, RegisterResult.class);
 
-        var request = buildRequest("POST", "/user", )
+    }
+
+    public LoginResult login(String[] params) throws ResponseException {
+        LoginRequest loginRequest = new LoginRequest(params[0],params[1]);
+        var request = buildRequest("POST", "/session", loginRequest);
+        var response = sendRequest(request);
+        return handleResponse(response, LoginResult.class);
     }
 
     private HttpRequest buildRequest(String method, String path, Object body) {
@@ -54,7 +62,7 @@ public class ServerFacade {
         if (!isSuccessful(status)) {
             var body = response.body();
             if (body != null) {
-                throw ResponseException.fromJson(body);
+                throw ResponseException.fromJson(body, status);
             }
 
             throw new ResponseException(ResponseException.fromHttpStatusCode(status), "other failure: " + status);
@@ -70,4 +78,6 @@ public class ServerFacade {
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
     }
+
+
 }
