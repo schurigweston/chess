@@ -94,8 +94,31 @@ public class TerminalClient {
         throw new ResponseException(ResponseException.Code.ClientError, "expected 1 arguments and got " + params.length);
     }
 
-    private String join(String[] params) {
-        return "maybe joined a game";
+    private String join(String[] params) throws ResponseException {
+        if(params.length == 2){
+            int gameID;
+            JoinRequest joinRequest;
+            if(gameSummaryMap.isEmpty()){
+                list();
+            }
+            try{
+                gameID = Integer.parseInt(params[0]);
+            } catch (Exception e) {
+                throw new ResponseException(ResponseException.Code.ClientError, "Invalid gameID");
+            }
+
+            if(params[1].equalsIgnoreCase("BLACK")){
+                joinRequest = new JoinRequest(authToken, "BLACK", gameSummaryMap.get(gameID).gameID());
+            }else if(params[1].equalsIgnoreCase("WHITE")){
+                joinRequest = new JoinRequest(authToken, "WHITE", gameSummaryMap.get(gameID).gameID());
+            }else{
+                throw new ResponseException(ResponseException.Code.ClientError, "Invalid Color");
+            }
+            JoinResult result = serverFacade.join(joinRequest); //returns a register result, which has username and authtoken
+
+            return "Joined " + gameSummaryMap.get(gameID).gameName() + " as " + params[1];
+        }
+        throw new ResponseException(ResponseException.Code.ClientError, "expected 2 arguments and got " + params.length);
     }
 
     private String observe(String[] params) {
