@@ -18,8 +18,10 @@ public class TerminalClient {
     private final ServerFacade serverFacade;
     private String authToken;
     private String username;
+    private HashMap<Integer, GameSummary> gameSummaryMap;
     public TerminalClient() {
         serverFacade = new ServerFacade();
+        gameSummaryMap = new HashMap<>();
     }
 
 
@@ -103,9 +105,9 @@ public class TerminalClient {
     private String list() throws ResponseException {
         ListResult result = serverFacade.listGames(authToken);
 
-        HashMap<Integer, GameSummary> gameSummaryMap = new HashMap<>();
         int k = 1;
         StringBuilder returnString = new StringBuilder();
+        gameSummaryMap.clear();
         for(GameSummary gameSummary : result.games()){
             gameSummaryMap.put(k, gameSummary);
             returnString.append(String.format("GameID: %d, %s, %s, %s%n", k, gameSummary.gameName(), gameSummary.whiteUsername(), gameSummary.blackUsername()));
