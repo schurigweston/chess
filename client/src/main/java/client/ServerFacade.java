@@ -18,7 +18,7 @@ public class ServerFacade {
 
     public RegisterResult register(String[] params) throws ResponseException{
         RegisterRequest registerRequest = new RegisterRequest(params[0],params[1],params[2]);
-        var request = buildRequest("POST", "/user", registerRequest);
+        var request = buildRequest("POST", "/user", registerRequest, null);
         var response = sendRequest(request);
         return handleResponse(response, RegisterResult.class);
 
@@ -26,19 +26,34 @@ public class ServerFacade {
 
     public LoginResult login(String[] params) throws ResponseException {
         LoginRequest loginRequest = new LoginRequest(params[0],params[1]);
-        var request = buildRequest("POST", "/session", loginRequest);
+        var request = buildRequest("POST", "/session", loginRequest, null);
         var response = sendRequest(request);
         return handleResponse(response, LoginResult.class);
     }
 
+    public CreateResult create(String[] params, String auth) throws ResponseException {
+        CreateRequest createRequest = new CreateRequest(auth, params[0]);
+        var request = buildRequest("POST", "/game", createRequest, auth);
+        var response = sendRequest(request);
+        return handleResponse(response, CreateResult.class);
+    }
 
+    public ListResult listGames(String auth) throws ResponseException {
+        ListRequest listRequest = new ListRequest(auth);
+        var request = buildRequest("GET", "/game", listRequest, auth);
+        var response = sendRequest(request);
+        return handleResponse(response, ListResult.class);
+    }
 
-    private HttpRequest buildRequest(String method, String path, Object body) {
+    private HttpRequest buildRequest(String method, String path, Object body, String authToken) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
                 .method(method, makeRequestBody(body));
         if (body != null) {
             request.setHeader("Content-Type", "application/json");
+        }
+        if (authToken != null) {
+            request.setHeader("Authorization", authToken);
         }
         return request.build();
     }
@@ -80,6 +95,7 @@ public class ServerFacade {
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
     }
+
 
 
 }

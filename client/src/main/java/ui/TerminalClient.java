@@ -1,6 +1,8 @@
 package ui;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import client.ResponseException;
@@ -80,8 +82,14 @@ public class TerminalClient {
         return "logged out";
     }
 
-    private String create(String[] params) {
-        return "maybe created a game";
+    private String create(String[] params) throws ResponseException {
+        if(params.length == 1){
+
+            CreateResult result = serverFacade.create(params, authToken); //returns a register result, which has username and authtoken
+
+            return "Created game " + params[0];
+        }
+        throw new ResponseException(ResponseException.Code.ClientError, "expected 1 arguments and got " + params.length);
     }
 
     private String join(String[] params) {
@@ -92,8 +100,22 @@ public class TerminalClient {
         return "maybe looked at a game";
     }
 
-    private String list() {
-        return "some games";
+    private String list() throws ResponseException {
+        ListResult result = serverFacade.listGames(authToken);
+
+        HashMap<Integer, GameSummary> gameSummaryMap = new HashMap<>();
+        int k = 1;
+        StringBuilder returnString = new StringBuilder();
+        for(GameSummary gameSummary : result.games()){
+            gameSummaryMap.put(k, gameSummary);
+            returnString.append(String.format("GameID: %d, %s, %s, %s%n", k, gameSummary.gameName(), gameSummary.whiteUsername(), gameSummary.blackUsername()));
+            k++;
+        }
+        if (!returnString.isEmpty()){
+            returnString.deleteCharAt(returnString.length()-1);
+        }
+
+        return returnString.toString();
     }
 
     private String innerHelp() {
