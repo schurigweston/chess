@@ -54,7 +54,7 @@ public class TerminalClient {
 
     public String eval(String input) {
         try {
-            String[] tokens = input.toLowerCase().split(" ");
+            String[] tokens = input.trim().toLowerCase().split("\\s+");
             String cmd = tokens[0];
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             //This makes cmd be the first typed, and params be everything after.

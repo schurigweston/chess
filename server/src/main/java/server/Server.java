@@ -84,7 +84,7 @@ public class Server{
         } catch (DataAccessException e) {
             String msg = e.getMessage();
             if (msg.contains("does not exist")) {
-                ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+                ctx.status(401).json(Map.of("message", "Error: incorrect username or password"));
             } else if (msg.contains("bad request")) {
                 ctx.status(400).json(Map.of("message", "Error: bad request"));
             } else {
