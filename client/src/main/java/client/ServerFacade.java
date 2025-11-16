@@ -114,7 +114,9 @@ public class ServerFacade {
     }
 
     private boolean looksLikeJson(String body) {
-        if (body == null) return false;
+        if (body == null){
+            return false;
+        }
         body = body.trim();
         return body.startsWith("{") && body.endsWith("}");
     }

@@ -156,7 +156,8 @@ public class TerminalClient {
         gameSummaryMap.clear();
         for(GameSummary gameSummary : result.games()){
             gameSummaryMap.put(k, gameSummary);
-            returnString.append(String.format("GameID: %d, %s, %s, %s%n", k, gameSummary.gameName(), gameSummary.whiteUsername(), gameSummary.blackUsername()));
+            returnString.append(String.format("GameID: %d, %s, %s, %s%n",
+                    k, gameSummary.gameName(), gameSummary.whiteUsername(), gameSummary.blackUsername()));
             k++;
         }
         if (!returnString.isEmpty()){
@@ -234,6 +235,8 @@ public class TerminalClient {
     }
 
     public void drawBoard(boolean whitePerspective) {
+
+
         String[][] board = {
                 {BLACK_ROOK,  BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK},
                 {BLACK_PAWN,  BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN,  BLACK_PAWN, BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN},
@@ -245,15 +248,21 @@ public class TerminalClient {
                 {WHITE_ROOK,  WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK}
         };
 
+        class Helper{
+            public static void printCell(int i, int j, String[][] board){
+                if ((i + j) % 2 == 0) {
+                    System.out.print(SET_BG_COLOR_LIGHT_GREY + board[i][j] + RESET_BG_COLOR);
+                } else {
+                    System.out.print(SET_BG_COLOR_DARK_GREY + board[i][j] + RESET_BG_COLOR);
+                }
+            }
+        }
+
         if (!whitePerspective) {
             for (int i = 7; i >= 0; i--) {
                 System.out.print((8 - i) + " ");
                 for (int j = 7; j >= 0; j--) {
-                    if ((i + j) % 2 == 0) {
-                        System.out.print(SET_BG_COLOR_LIGHT_GREY + board[i][j] + RESET_BG_COLOR);
-                    } else {
-                        System.out.print(SET_BG_COLOR_DARK_GREY + board[i][j] + RESET_BG_COLOR);
-                    }
+                    Helper.printCell(i, j, board);
                 }
                 System.out.println();
             }
@@ -265,11 +274,7 @@ public class TerminalClient {
             for (int i = 0; i < board.length; i++) {
                 System.out.print((8-i) + " ");
                 for (int j = 0; j < board[i].length; j++) {
-                    if ((i + j) % 2 == 0) {
-                        System.out.print(SET_BG_COLOR_LIGHT_GREY + board[i][j] + RESET_BG_COLOR);
-                    } else {
-                        System.out.print(SET_BG_COLOR_DARK_GREY + board[i][j] + RESET_BG_COLOR);
-                    }
+                    Helper.printCell(i,j,board);
                 }
                 System.out.println();
             }
