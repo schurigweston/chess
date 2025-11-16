@@ -17,8 +17,13 @@ public class TerminalClient {
     private String authToken;
     private String username;
     private HashMap<Integer, GameSummary> gameSummaryMap;
+    public TerminalClient(String url) {
+        serverFacade = new ServerFacade(url);
+        gameSummaryMap = new HashMap<>();
+    }
+
     public TerminalClient() {
-        serverFacade = new ServerFacade();
+        serverFacade = new ServerFacade("http://localhost:8080");
         gameSummaryMap = new HashMap<>();
     }
 

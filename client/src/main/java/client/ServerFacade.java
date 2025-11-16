@@ -11,10 +11,12 @@ import model.*;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
-    private final String serverUrl = "http://localhost:8080";
+    private final String serverUrl;
 
 //What does a ServerFacade do? It sends requests to the server and receives responses from the server.
-
+    public ServerFacade(String url){
+        serverUrl = url;
+    }
 
     public RegisterResult register(String[] params) throws ResponseException{
         RegisterRequest registerRequest = new RegisterRequest(params[0],params[1],params[2]);
@@ -86,7 +88,7 @@ public class ServerFacade {
         var status = response.statusCode();
         if (!isSuccessful(status)) {
             var body = response.body();
-            if (body != null) {
+            if (looksLikeJson(body)) {
                 throw ResponseException.fromJson(body, status);
             }
 
@@ -106,9 +108,15 @@ public class ServerFacade {
 
     public void clear() throws ResponseException {
 
-        var request = buildRequest("DELETE", "/db", "","");
+        var request = buildRequest("DELETE", "/db", null,null);
         var response = sendRequest(request);
 
+    }
+
+    private boolean looksLikeJson(String body) {
+        if (body == null) return false;
+        body = body.trim();
+        return body.startsWith("{") && body.endsWith("}");
     }
 
 }
