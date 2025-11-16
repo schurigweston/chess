@@ -49,10 +49,4 @@ public class ResponseException extends Exception {
         };
     }
 
-//    public int toHttpStatusCode() {
-//        return switch (code) {
-//            case ServerError -> 500;
-//            case ClientError -> 400;
-//        };
-//    } //Just in case I need it later
 }
