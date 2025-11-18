@@ -26,6 +26,14 @@ public class ServerFacade {
 
     }
 
+    //Need logout. I forgot somehow.
+    public void logout(String auth) throws ResponseException {
+        LogoutRequest logoutRequest = new LogoutRequest(auth);
+        var request = buildRequest("DELETE", "/session", logoutRequest, auth);
+        var response = sendRequest(request);
+        //return handleResponse(response, LoginResult.class);
+    }
+
     public LoginResult login(String[] params) throws ResponseException {
         LoginRequest loginRequest = new LoginRequest(params[0],params[1]);
         var request = buildRequest("POST", "/session", loginRequest, null);

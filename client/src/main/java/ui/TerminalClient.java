@@ -82,7 +82,8 @@ public class TerminalClient {
         }
     }
 
-    private String logout() {
+    private String logout() throws ResponseException {
+        serverFacade.logout(authToken);
         authToken = null;
         return "logged out";
     }

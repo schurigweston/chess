@@ -94,7 +94,7 @@ public class ServerFacadeTests {
         String[] registerParams = {"loginUser", "password123", "login@email.com"};
         facade.register(registerParams);
 
-        // Try to login with wrong password
+        // Try to log in with wrong password
         String[] loginParams = {"loginUser", "wrongPassword"};
         ResponseException exception = Assertions.assertThrows(
                 ResponseException.class,
