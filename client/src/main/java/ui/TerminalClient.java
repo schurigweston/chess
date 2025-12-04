@@ -139,6 +139,7 @@ public class TerminalClient {
             }
             try{
                 gameID = Integer.parseInt(params[0]);
+                gameSummaryMap.get(gameID).gameID();
             } catch (Exception e) {
                 throw new ResponseException(ResponseException.Code.ClientError, "Invalid gameID");
             }
