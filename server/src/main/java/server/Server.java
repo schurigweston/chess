@@ -7,6 +7,7 @@ import dataaccess.MemoryDataAccess;
 import io.javalin.json.JavalinGson;
 import io.javalin.*;
 import io.javalin.http.Context;
+import io.javalin.websocket.WsConfig;
 import model.*;
 import org.jetbrains.annotations.NotNull;
 import service.*;
@@ -42,10 +43,29 @@ public class Server{
         javalin.get("/game", ctx -> listGames(ctx));
         javalin.post("/game", ctx -> createGame(ctx));
         javalin.put("/game", ctx -> joinGame(ctx));
+        javalin.ws("/ws", ctx -> joinWebSocket(ctx));
 
 
         // Register your endpoints and exception handlers here.
 
+    }
+
+    private void joinWebSocket(WsConfig ctx) {
+        ctx.onConnect(session -> {
+            // Client opens a socket (before sending CONNECT command)
+        });
+
+        ctx.onMessage((session, message) -> {
+            // Server receives text (JSON) from client
+        });
+
+        ctx.onClose((session, status, message) -> {
+            // Client disconnects
+        });
+
+        ctx.onError((session, throwable) -> {
+            // Something goes wrong
+        });
     }
 
     private void clearDatabase(@NotNull Context ctx) {
